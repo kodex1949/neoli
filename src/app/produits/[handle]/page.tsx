@@ -4,8 +4,12 @@ import { Accordion, ReadMore } from "@/components/Accordion";
 import { ProductBuy } from "@/components/ProductBuy";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGallery } from "@/components/ProductGallery";
+import { ProductReviews } from "@/components/ProductReviews";
+import { getReviews } from "@/lib/reviews";
 import { ACCORDIONS, FALLBACK_TEXT, PERKS } from "@/lib/product-content";
 import { getProduct, getProducts } from "@/lib/shopify";
+
+export const revalidate = 60;
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -20,6 +24,7 @@ export default async function ProductPage({ params }: Props) {
   const product = await getProduct(handle);
   if (!product) notFound();
 
+  const reviews = await getReviews(product.handle);
   const more = (await getProducts(8)).filter((p) => p.handle !== product.handle).slice(0, 4);
 
   return (
@@ -38,6 +43,8 @@ export default async function ProductPage({ params }: Props) {
           </ul>
         </div>
       </section>
+
+      <ProductReviews handle={product.handle} data={reviews} />
 
       {more.length > 0 && (
         <section className="pdp__sugg">

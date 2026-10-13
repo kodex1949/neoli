@@ -2190,3 +2190,41 @@ a.acct__card:hover { transform: none; box-shadow: none; border-color: #33383c; }
   .info__sec h2 { font-size: 23px; }
   .info__contact { padding: 36px 24px; }
 }
+
+/* ===== Avis clients ===== */
+.stars { --s: 16px; position: relative; display: inline-block; width: calc(var(--s) * 5); height: var(--s); background: linear-gradient(90deg, #d9dcde 0 0); -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><path d='M10 1.5l2.6 5.5 6 .8-4.4 4.2 1.1 6L10 15l-5.3 3 1.1-6L1.4 7.8l6-.8z'/></svg>") 0 0 / var(--s) var(--s) repeat-x; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><path d='M10 1.5l2.6 5.5 6 .8-4.4 4.2 1.1 6L10 15l-5.3 3 1.1-6L1.4 7.8l6-.8z'/></svg>") 0 0 / var(--s) var(--s) repeat-x; vertical-align: middle; }
+.stars__fill { position: absolute; inset: 0 auto 0 0; background: #1f2326; }
+.rev { max-width: 1180px; margin: 0 auto; padding: 96px 32px 24px; }
+.rev__head { display: grid; gap: 12px; margin-bottom: 48px; }
+.rev__grid { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 96px; align-items: start; border-top: 1px solid var(--line); padding-top: 48px; }
+.rev__sum { display: grid; gap: 12px; justify-items: start; position: sticky; top: 120px; }
+.rev__avg { margin: 0; font-family: var(--font-serif); font-weight: 300; font-size: 64px; line-height: 1; letter-spacing: -.03em; color: #1f2326; }
+.rev__avg span { font-size: 20px; color: #8a8f91; letter-spacing: 0; }
+.rev__count, .rev__none { margin: 0; font-size: 14px; color: #7b8487; line-height: 1.6; }
+.rev__dist { list-style: none; margin: 12px 0 8px; padding: 0; display: grid; gap: 8px; width: 100%; }
+.rev__dist li { display: grid; grid-template-columns: 12px 1fr 20px; gap: 12px; align-items: center; font-size: 12px; color: #7b8487; }
+.rev__dist i { display: block; height: 2px; background: var(--line); }
+.rev__dist b { display: block; height: 100%; background: #1f2326; }
+.rev__open, .rev__send { height: 48px; padding: 0 28px; background: #010101; color: #fff; border: 1px solid #010101; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; cursor: pointer; transition: background .3s, color .3s; }
+.rev__open:hover, .rev__send:hover:not(:disabled) { background: #fff; color: #010101; }
+.rev__send:disabled { opacity: .35; cursor: default; }
+.rev__cancel { background: none; border: 0; padding: 0 8px; font-size: 13px; color: #7b8487; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.rev__login { margin: 0; font-size: 14px; color: #4a5154; } .rev__login a { color: #1f2326; text-underline-offset: 4px; }
+.rev__form { display: grid; gap: 12px; width: 100%; margin-top: 12px; }
+.rev__form input, .rev__form textarea { width: 100%; box-sizing: border-box; padding: 14px 16px; border: 1px solid var(--line-strong); background: #fff; font: inherit; font-size: 14px; color: #1f2326; border-radius: 0; resize: vertical; }
+.rev__form input:focus, .rev__form textarea:focus { outline: none; border-color: #1f2326; }
+.rev__pick { display: flex; gap: 4px; }
+.rev__pick button { background: none; border: 0; padding: 0; font-size: 30px; line-height: 1; color: #d9dcde; cursor: pointer; transition: color .2s; }
+.rev__pick button[data-on="true"] { color: #1f2326; }
+.rev__actions { display: flex; align-items: center; gap: 12px; }
+.rev__msg { margin: 0; font-size: 13px; line-height: 1.5; color: #4a5154; } .rev__msg[data-kind="error"] { color: #b42318; }
+.rev__list { display: grid; }
+.rev__item { padding: 0 0 36px; margin: 0 0 36px; border-bottom: 1px solid var(--line); max-width: 700px; }
+.rev__item:last-child { border-bottom: 0; }
+.rev__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.rev__top time { font-size: 12px; color: #8a8f91; }
+.rev__item h3 { margin: 0 0 8px; font-family: var(--font-serif); font-weight: 350; font-size: 22px; line-height: 1.25; color: #1f2326; }
+.rev__item p { margin: 0 0 12px; font-size: 15px; line-height: 1.75; color: #4a5154; white-space: pre-line; }
+.rev__item .rev__by { margin: 0; font-size: 13px; color: #7b8487; }
+.rev__badge { margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--line-strong); font-size: 12px; color: #1f2326; }
+@media (max-width: 900px) { .rev { padding: 56px 20px 16px; } .rev__grid { grid-template-columns: 1fr; gap: 40px; } .rev__sum { position: static; } .rev__avg { font-size: 52px; } }
