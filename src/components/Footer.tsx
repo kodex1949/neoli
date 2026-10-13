@@ -12,7 +12,7 @@ const perks = [
 
 const cols: { title: string; links: { label: string; href: string }[] }[] = [
   { title: "Trouver une boutique", links: [{ label: "Nos boutiques", href: "#" }, { label: "Prendre rendez-vous", href: "#" }, { label: "Conseil olfactif", href: "/conseil-olfactif" }] },
-  { title: "Service client", links: [{ label: "Contact", href: "mailto:contact@neoli.example" }, { label: "Livraison", href: "/info/livraison" }, { label: "Retours et rétractation", href: "/info/retours" }, { label: "FAQ", href: "#" }, { label: "La carte cadeau", href: "#" }] },
+  { title: "Service client", links: [{ label: "Contact", href: "mailto:contact@neoli.example" }, { label: "Livraison", href: "/info/livraison" }, { label: "Retours et rétractation", href: "/info/retours" }, { label: "FAQ", href: "/info/faq" }, { label: "La carte cadeau", href: "#" }] },
   { title: "Néoli", links: [{ label: "Notre histoire", href: "#" }, { label: "Engagements", href: "#" }, { label: "Carrières", href: "#" }, { label: "Presse", href: "#" }] },
   { title: "Légal", links: [{ label: "Mentions légales", href: "/info/mentions-legales" }, { label: "Politique de vie privée", href: "/info/confidentialite" }, { label: "Conditions générales de vente", href: "/info/conditions" }, { label: "Accessibilité", href: "#" }, { label: "Préférences de cookies", href: "#" }] },
 ];

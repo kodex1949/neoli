@@ -2,6 +2,20 @@
 export type LegalPage = { title: string; lead: string; sections: { h: string; p: string[] }[] };
 
 export const LEGAL: Record<string, LegalPage> = {
+  faq: {
+    title: "FAQ",
+    lead: "Les réponses aux questions les plus fréquentes.",
+    sections: [
+      { h: "Comment passer commande ?", p: ["Ajoutez vos produits au panier, puis suivez les étapes de paiement sécurisé. Vous pouvez commander avec ou sans compte ; un compte vous permet de suivre vos commandes et de profiter du Cercle Néoli."] },
+      { h: "Quand ma commande sera-t-elle livrée ?", p: ["Un e-mail de suivi vous est envoyé dès l'expédition. Retrouvez les délais et les frais sur la page Livraison. La livraison est offerte dès 100 € d'achat."] },
+      { h: "Comment suivre ma commande ?", p: ["Connectez-vous à votre compte, rubrique « Mes commandes » : vous y retrouvez le statut, le suivi et vos factures."] },
+      { h: "Puis-je retourner un produit ?", p: ["Oui, vous disposez de 14 jours après réception pour vous rétracter. Les produits doivent être non ouverts, dans leur emballage d'origine. Les détails sont sur la page Retours et rétractation."] },
+      { h: "Qu'est-ce que le Cercle Néoli ?", p: ["Notre programme de fidélité : vous gagnez des points à chaque achat et accédez à des avantages réservés aux membres. Votre solde est dans « Mes avantages »."] },
+      { h: "Comment fonctionne le parrainage ?", p: ["Votre code personnel se trouve dans la rubrique « Parrainage » de votre compte. Partagez-le avec vos proches : chaque parrainage vous fait gagner des points."] },
+      { h: "Comment choisir mon parfum ?", p: ["Renseignez votre profil olfactif dans votre compte : nous vous proposons ensuite des parfums à votre image. Les miniatures permettent aussi de découvrir avant de choisir un grand format."] },
+      { h: "Comment vous contacter ?", p: ["Écrivez-nous à contact@neoli.example, nous répondons sous 48 h ouvrées."] },
+    ],
+  },
   "mentions-legales": {
     title: "Mentions légales",
     lead: "Informations légales relatives au site Néoli.",
