@@ -169,12 +169,14 @@ export function AuthForm({ next, initialMode = "login" }: { next: string; initia
         {mode !== "reset" && (
           <>
             <button type="button" className="auth__magic" onClick={magic}>Recevoir un lien de connexion par e-mail</button>
-            <div className="auth__or"><span>ou continuez avec</span></div>
-            <div className="auth__social">
-              <button type="button" className="auth__btn auth__btn--full" onClick={() => social("apple")}>Apple</button>
-              <button type="button" onClick={() => social("google")} className="auth__btn">Google</button>
-              <button type="button" onClick={() => social("facebook")} className="auth__btn">Facebook</button>
-            </div>
+            {process.env.NEXT_PUBLIC_GOOGLE_LOGIN === "1" && (
+              <>
+                <div className="auth__or"><span>ou continuez avec</span></div>
+                <div className="auth__social">
+                  <button type="button" onClick={() => social("google")} className="auth__btn auth__btn--full">Google</button>
+                </div>
+              </>
+            )}
           </>
         )}
 
