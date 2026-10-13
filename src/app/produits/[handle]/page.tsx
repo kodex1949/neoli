@@ -4,7 +4,7 @@ import { Accordion, ReadMore } from "@/components/Accordion";
 import { ProductBuy } from "@/components/ProductBuy";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGallery } from "@/components/ProductGallery";
-import { ProductReviews } from "@/components/ProductReviews";
+import { ReviewsPanel } from "@/components/ReviewsPanel";
 import { getReviews } from "@/lib/reviews";
 import { ACCORDIONS, FALLBACK_TEXT, PERKS } from "@/lib/product-content";
 import { getProduct, getProducts } from "@/lib/shopify";
@@ -38,13 +38,12 @@ export default async function ProductPage({ params }: Props) {
         <ReadMore text={product.description ?? FALLBACK_TEXT} />
         <div className="pdp__aside">
           <Accordion items={ACCORDIONS} />
+          <ReviewsPanel handle={product.handle} data={reviews} />
           <ul className="pdp__perks">
             {PERKS.map((p) => <li key={p}>{p}</li>)}
           </ul>
         </div>
       </section>
-
-      <ProductReviews handle={product.handle} data={reviews} />
 
       {more.length > 0 && (
         <section className="pdp__sugg">
