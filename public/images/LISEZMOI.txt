@@ -1,0 +1,10 @@
+Dossier des images du site.
+
+Pour les deux tuiles à gauche et à droite du héros, déposez ici :
+  tuile-gauche.jpg
+  tuile-droite.jpg
+
+Format conseillé : portrait (2:3), au moins 800 x 1200 px, moins de 500 Ko chacune.
+Utilisez des images qui vous appartiennent ou libres de droits.
+
+Ensuite, dites-moi quand les fichiers sont en place : je les branche dans src/app/page.tsx.

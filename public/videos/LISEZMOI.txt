@@ -1,0 +1,11 @@
+Dossier des vidéos et images du héros.
+
+Mettez ici :
+  hero.mp4   -> votre vidéo (de préférence moins de 8 Mo, sans son)
+  hero.jpg   -> image d'aperçu affichée avant le chargement
+
+Puis dans src/app/page.tsx, ajoutez dans <HeroStory ... /> :
+  video="/videos/hero.mp4"
+  poster="/videos/hero.jpg"
+
+N'utilisez que des médias dont vous avez les droits (vos propres images ou une banque libre de droits).
