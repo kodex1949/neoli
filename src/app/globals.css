@@ -2232,3 +2232,15 @@ a.acct__card:hover { transform: none; box-shadow: none; border-color: #33383c; }
 .rev__item p { margin: 0 0 10px; font-size: 14px; line-height: 22px; color: #4a5154; white-space: pre-line; }
 .rev__item .rev__by { margin: 0; font-size: 13px; color: #7b8487; }
 .rev__badge { margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--line-strong); font-size: 12px; color: #1f2326; }
+
+/* Panneau des avis : même ouverture que le menu (révélé d'un côté, éléments qui glissent avec 0,05 s de décalage) */
+@keyframes rev-expand { from { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); } to { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); } }
+@keyframes rev-slide { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+@media (min-width: 769px) {
+  .sheet__scrim--menu { backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); background: rgba(1, 1, 1, .25); transition: opacity .15s linear, visibility 0s linear .15s; }
+  .sheet__scrim--menu[data-open="true"] { transition: none; }
+  .sheet.sheet--menu { transform: none; opacity: 0; background: rgba(255, 255, 255, .9); transition: opacity .15s linear, visibility 0s linear .15s; }
+  .sheet.sheet--menu[data-open="true"] { opacity: 1; transition: none; animation: rev-expand .45s var(--ease-both); }
+  .sheet--menu[data-open="true"] .sheet__anim { animation: rev-slide .45s var(--ease-both) backwards; animation-delay: calc(.05s * var(--i, 0)); }
+}
+@media (prefers-reduced-motion: reduce) { .sheet.sheet--menu[data-open="true"], .sheet--menu[data-open="true"] .sheet__anim { animation: none; } }

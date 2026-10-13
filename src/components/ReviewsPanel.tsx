@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useSheetDrag } from "@/lib/sheet";
 import { Stars } from "./Stars";
 import { ReviewForm } from "./ReviewForm";
 import type { ReviewData } from "@/lib/reviews";
 
+const idx = (i: number) => ({ "--i": i }) as CSSProperties;
 const date = (d: string) => new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(d));
 
 /** Rangée « Avis clients » (note + nombre) qui ouvre le même panneau latéral que Ingrédients / Livraison. */
@@ -44,19 +45,19 @@ export function ReviewsPanel({ handle, data }: { handle: string; data: ReviewDat
 
       {mounted && createPortal(
         <>
-          <div className="sheet__scrim" data-open={open} onClick={close} aria-hidden="true" />
-          <aside className="sheet" ref={sheet.ref} data-open={open} role="dialog" aria-label="Avis clients" inert={!open}>
+          <div className="sheet__scrim sheet__scrim--menu" data-open={open} onClick={close} aria-hidden="true" />
+          <aside className="sheet sheet--menu" ref={sheet.ref} data-open={open} role="dialog" aria-label="Avis clients" inert={!open}>
             <div className="sheet__grab" {...sheet.grab} />
             <div className="sheet__top">
               <button type="button" className="user__close" onClick={close} aria-label="Fermer">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 17.5 17.5 6.5" /><path d="M6.5 6.5 17.5 17.5" /></svg>
               </button>
             </div>
-            <div className="sheet__tabs"><span className="sheet__tab" aria-selected="true">Avis clients</span></div>
+            <div className="sheet__tabs sheet__anim" style={idx(0)}><span className="sheet__tab" aria-selected="true">Avis clients</span></div>
             <div className="sheet__body">
               <section className="sheet__sec rev">
                 {data.count > 0 ? (
-                  <div className="rev__sum">
+                  <div className="rev__sum sheet__anim" style={idx(1)}>
                     <p className="rev__avg">{data.average.toFixed(1).replace(".", ",")}<span> / 5</span></p>
                     <div>
                       <Stars value={data.average} size={18} />
@@ -69,12 +70,12 @@ export function ReviewsPanel({ handle, data }: { handle: string; data: ReviewDat
                     </ul>
                   </div>
                 ) : (
-                  <p className="rev__none">Aucun avis pour le moment. Soyez le premier à donner le vôtre.</p>
+                  <p className="rev__none sheet__anim" style={idx(1)}>Aucun avis pour le moment. Soyez le premier à donner le vôtre.</p>
                 )}
-                <ReviewForm handle={handle} />
+                <div className="sheet__anim" style={idx(2)}><ReviewForm handle={handle} /></div>
                 <div className="rev__list">
-                  {data.items.map((r) => (
-                    <article key={r.id} className="rev__item">
+                  {data.items.map((r, k) => (
+                    <article key={r.id} className="rev__item sheet__anim" style={idx(3 + k)}>
                       <div className="rev__top"><Stars value={r.rating} /><time dateTime={r.created_at}>{date(r.created_at)}</time></div>
                       {r.title && <h3>{r.title}</h3>}
                       <p>{r.body}</p>
