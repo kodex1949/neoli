@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useSheetDrag } from "@/lib/sheet";
+
+const idx = (i: number) => ({ "--i": i }) as CSSProperties;
 
 export type PanelItem = { title: string; text: string; points?: string[] };
 
@@ -45,15 +47,15 @@ export function Accordion({ items }: { items: PanelItem[] }) {
 
       {mounted && createPortal(
         <>
-          <div className="sheet__scrim" data-open={open !== null} onClick={close} aria-hidden="true" />
-          <aside className="sheet" ref={sheet.ref} data-open={open !== null} role="dialog" aria-label="Détails du produit" inert={open === null}>
+          <div className="sheet__scrim sheet__scrim--menu" data-open={open !== null} onClick={close} aria-hidden="true" />
+          <aside className="sheet sheet--menu" ref={sheet.ref} data-open={open !== null} role="dialog" aria-label="Détails du produit" inert={open === null}>
             <div className="sheet__grab" {...sheet.grab} />
             <div className="sheet__top">
               <button type="button" className="user__close" onClick={close} aria-label="Fermer">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 17.5 17.5 6.5" /><path d="M6.5 6.5 17.5 17.5" /></svg>
               </button>
             </div>
-            <div className="sheet__tabs" ref={tabsRef} role="tablist" aria-label="Détails du produit">
+            <div className="sheet__tabs sheet__anim" style={idx(0)} ref={tabsRef} role="tablist" aria-label="Détails du produit">
               {items.map((x, k) => (
                 <button key={x.title} type="button" role="tab" id={`tab-${k}`} aria-selected={tab === k} aria-controls="sheet-panel" className="sheet__tab" onClick={() => setTab(k)}>
                   {x.title}
@@ -62,11 +64,11 @@ export function Accordion({ items }: { items: PanelItem[] }) {
             </div>
             <div className="sheet__body" id="sheet-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
               <section key={tab} className="sheet__sec">
-                <h2 className="sheet__title">{items[tab].title}</h2>
-                <p className="sheet__text">{items[tab].text}</p>
+                <h2 className="sheet__title sheet__anim" style={idx(1)}>{items[tab].title}</h2>
+                <p className="sheet__text sheet__anim" style={idx(2)}>{items[tab].text}</p>
                 {items[tab].points && (
                   <ul className="sheet__points">
-                    {items[tab].points!.map((y) => <li key={y}>{y}</li>)}
+                    {items[tab].points!.map((y, n) => <li key={y} className="sheet__anim" style={idx(3 + n)}>{y}</li>)}
                   </ul>
                 )}
               </section>
