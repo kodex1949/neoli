@@ -178,7 +178,7 @@ export function AuthForm({ next, initialMode = "login" }: { next: string; initia
           </>
         )}
 
-        <p className="auth__legal">En continuant, vous acceptez nos <Link href="/conditions">conditions d'utilisation</Link> et notre <Link href="/confidentialite">politique de confidentialité</Link>.</p>
+        <p className="auth__legal">En continuant, vous acceptez nos <Link href="/info/conditions">conditions d'utilisation</Link> et notre <Link href="/info/confidentialite">politique de confidentialité</Link>.</p>
       </div>
     </AuthShell>
   );
