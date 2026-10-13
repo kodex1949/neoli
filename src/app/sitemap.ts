@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getProducts } from "@/lib/shopify";
+import { getProducts, getCollection } from "@/lib/shopify";
 import { MENU } from "@/lib/menu";
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://neoli-nu.vercel.app").replace(/\/$/, "");
@@ -13,10 +13,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   let products: { handle: string }[] = [];
   try { products = await getProducts(100); } catch { /* catalogue indisponible : on garde les pages statiques */ }
+  // Seules les collections qui existent vraiment dans Shopify entrent dans le sitemap (pas de pages 404)
+  const existing = (
+    await Promise.all(
+      [...hrefs].map(async (h) => {
+        try { return (await getCollection(h.replace("/collections/", ""))) ? h : null; } catch { return null; }
+      }),
+    )
+  ).filter((h): h is string => !!h);
   const now = new Date();
   return [
     { url: BASE, lastModified: now, priority: 1 },
-    ...[...hrefs].map((h) => ({ url: BASE + h, lastModified: now, priority: 0.7 })),
+    ...existing.map((h) => ({ url: BASE + h, lastModified: now, priority: 0.7 })),
     ...products.map((p) => ({ url: `${BASE}/produits/${p.handle}`, lastModified: now, priority: 0.8 })),
   ];
 }
