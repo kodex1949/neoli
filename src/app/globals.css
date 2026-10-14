@@ -2563,3 +2563,40 @@ a.collection__chip { display: inline-flex; align-items: center; text-decoration:
   .filt__row:active, .filt__opt:active, .filt__apply:active, .pf__chips button:active, .acct__btn:active, .stories__card:active { transform: none; }
 }
 .filt__row, .filt__quick, .stories__card { transition-duration: 160ms; }
+
+/* ───────── Accueil : contrôle « design engineering » ───────── */
+/* Héros : l'arrivée garde son temps (1 s), le retour est plus vif (0,5 s). */
+.story__visual { transition-duration: .6s; }
+.story[data-active="true"] .story__visual { transition-duration: 1s; }
+.story__tile { transition-duration: .5s; }
+.story[data-active="true"] .story__tile { transition-duration: 1s; }
+
+/* Révélation au scroll : l'échelonnage est plafonné (6 éléments au plus), sinon le bas de page arrive trop tard. */
+[data-reveal] { transition-delay: calc(min(var(--d, 0), 6) * 70ms); }
+
+/* Survol des tuiles « Nouveauté » : 0,5 s au lieu de 0,8–1,2 s (geste répété). */
+.look__tile-media { transition-duration: .4s; }
+.look__tile-media img, .look__ph { transition-duration: .5s; }
+
+/* Boutons d'appel à l'action : retour à la pression. */
+.look__cta, .coll__cta { transition: box-shadow .5s var(--ease-both), transform .16s var(--ease-out-strong); }
+.look__cta:active, .coll__cta:active { transform: scale(0.97); }
+.look__dots button:active { transform: scale(0.92); }
+
+/* Écran tactile : pas de survol « collé ». */
+@media (hover: none) {
+  .look__tile:hover .look__tile-media { box-shadow: 0 0 0 1px rgba(1, 1, 1, .03) inset; }
+  .look__tile:hover .look__tile-media img, .look__tile:hover .look__ph { transform: none; }
+  .look__dots button:hover { transform: none; }
+  .look__cta:hover { box-shadow: 0 4px 80px rgba(1, 1, 1, .12); }
+  .look__cta:hover svg, .coll__cta:hover svg { transform: none; }
+  .coll__panel:hover .coll__media img { filter: brightness(.62) saturate(.85); }
+}
+
+/* Mouvement réduit : plus de déplacement à l'arrivée, juste des fondus rapides. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { transition-duration: .2s; transition-delay: 0s; translate: none !important; }
+  .story__tile, .story[data-active="true"] .story__tile { transition-duration: .2s; transition-delay: 0s; transform: none; }
+  .coll__in { transform: none; transition-duration: .2s; transition-delay: 0s; }
+  .look__cta:active, .coll__cta:active, .look__dots button:active { transform: none; }
+}
