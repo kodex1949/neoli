@@ -30,8 +30,8 @@ export async function saveMenuMedia(slot: string, kind: "image" | "video", url: 
 export async function resetMenuMedia(slot: string) {
   if (!known(slot)) throw new Error("Emplacement inconnu.");
   const db = await admin();
-  const { data } = await db.from("menu_media").select("url,title,eyebrow,cta,href").eq("slot", slot).maybeSingle();
-  if (data && (data.title || data.eyebrow || data.cta || data.href)) await db.from("menu_media").update({ kind: null, url: null, updated_at: new Date().toISOString() }).eq("slot", slot);
+  const { data } = await db.from("menu_media").select("url,title,eyebrow,cta,href,text,label").eq("slot", slot).maybeSingle();
+  if (data && (data.title || data.eyebrow || data.cta || data.href || data.text || data.label)) await db.from("menu_media").update({ kind: null, url: null, updated_at: new Date().toISOString() }).eq("slot", slot);
   else await db.from("menu_media").delete().eq("slot", slot);
   const path = data?.url?.split("/storage/v1/object/public/menu-media/")[1];
   if (path) await db.storage.from("menu-media").remove([decodeURIComponent(path)]);
@@ -45,14 +45,14 @@ const clean = (s: string | undefined, max: number) => {
 };
 
 /** Enregistre titre, sous-titre, bouton (CTA) et lien d'un emplacement. Un champ vide retrouve le texte d'origine. */
-export async function saveMenuText(slot: string, fields: { title?: string; eyebrow?: string; cta?: string; href?: string }) {
+export async function saveMenuText(slot: string, fields: { title?: string; eyebrow?: string; cta?: string; href?: string; text?: string; label?: string }) {
   if (!known(slot)) throw new Error("Emplacement inconnu.");
   const href = clean(fields.href, 300);
   if (href && !/^(\/|https:\/\/)/.test(href)) throw new Error("Le lien doit commencer par « / » (page du site) ou « https:// ».");
   const db = await admin();
   const { data } = await db.from("menu_media").select("url").eq("slot", slot).maybeSingle();
-  const row = { title: clean(fields.title, 120), eyebrow: clean(fields.eyebrow, 120), cta: clean(fields.cta, 60), href };
-  const empty = !row.title && !row.eyebrow && !row.cta && !row.href;
+  const row = { title: clean(fields.title, 120), eyebrow: clean(fields.eyebrow, 120), cta: clean(fields.cta, 60), href, text: clean(fields.text, 400), label: clean(fields.label, 40) };
+  const empty = !row.title && !row.eyebrow && !row.cta && !row.href && !row.text && !row.label;
   if (empty && !data?.url) await db.from("menu_media").delete().eq("slot", slot);
   else {
     const { error } = await db.from("menu_media").upsert({ slot, ...row, updated_at: new Date().toISOString() });

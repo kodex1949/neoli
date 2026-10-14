@@ -4,13 +4,15 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import type { HomeCollection } from "@/lib/collections";
 
+export type ShowcaseItem = HomeCollection & { video?: string; cta?: string };
+
 const DURATION = 6; // secondes par panneau
 
 /**
  * « La nouvelle icône couture » : une rangée de panneaux verticaux. Celui qui est actif s'ouvre en grand (visuel, titre, texte, bouton),
  * les autres restent en lames avec leur nom à la verticale. Ouverture au survol / au clic / au clavier, avance automatique avec barre de progression.
  */
-export function CollectionsShowcase({ items, eyebrow, title, href }: { items: HomeCollection[]; eyebrow: string; title: string; href: string }) {
+export function CollectionsShowcase({ items, eyebrow, title, href, cta = "Découvrir" }: { items: ShowcaseItem[]; eyebrow: string; title: string; href: string; cta?: string }) {
   const [active, setActive] = useState(0);
   const [auto, setAuto] = useState(true);
   const root = useRef<HTMLElement>(null);
@@ -40,7 +42,7 @@ export function CollectionsShowcase({ items, eyebrow, title, href }: { items: Ho
       <header className="coll__head">
         <span className="eyebrow coll__in" style={{ "--d": "0s" } as CSSProperties}>{eyebrow}</span>
         <h2 className="display coll__in" style={{ "--d": ".12s" } as CSSProperties}>{title}</h2>
-        <Link href={href} className="link coll__in" style={{ "--d": ".24s" } as CSSProperties}>Découvrir</Link>
+        <Link href={href} className="link coll__in" style={{ "--d": ".24s" } as CSSProperties}>{cta}</Link>
       </header>
 
 
@@ -62,7 +64,9 @@ export function CollectionsShowcase({ items, eyebrow, title, href }: { items: Ho
               onPointerEnter={(e) => hover(i, e)}
             >
               <div className="coll__media">
-                {c.image && (
+                {c.video ? (
+                  <video src={c.video} muted loop playsInline autoPlay preload="none" style={{ objectPosition: c.position }} />
+                ) : c.image && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={c.image} alt="" loading="lazy" style={{ objectPosition: c.position }} />
                 )}
@@ -80,7 +84,7 @@ export function CollectionsShowcase({ items, eyebrow, title, href }: { items: Ho
                 <h3 className="coll__title">{c.title}</h3>
                 <p className="coll__text">{c.text}</p>
                 <Link href={c.href} className="coll__cta">
-                  Découvrir
+                  {c.cta || "Découvrir"}
                   <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M1 5h13M10 1l4 4-4 4" /></svg>
                 </Link>
               </div>

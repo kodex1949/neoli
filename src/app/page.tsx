@@ -4,7 +4,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { HeroStory } from "@/components/HeroStory";
 import { CollectionsShowcase } from "@/components/CollectionsShowcase";
 import { HOME_COLLECTIONS } from "@/lib/collections";
-import { LookSection } from "@/components/LookSection";
+import { EssentialsRail } from "@/components/EssentialsRail";
 import { HomeForYou } from "@/components/HomeForYou";
 import { IconicsShowcase } from "@/components/IconicsShowcase";
 import { getMenuMedia } from "@/lib/menu-media";
@@ -25,7 +25,24 @@ export default async function Home() {
       video: m?.url && m.kind === "video" ? m.url : undefined,
     };
   };
-  const lips = ((await getCollection("maquillage"))?.products ?? products.filter((p) => p.category === "Maquillage")).slice(0, 2);
+  // Essentiels tendance : les produits de la collection dont le lien est saisi dans l'admin (/collections/nom), sinon le catalogue.
+  const ess = media["home:essentials"];
+  const essHref = ess?.href || "/collections/best-sellers";
+  const essHandle = essHref.match(/^\/collections\/([^/?#]+)/)?.[1];
+  const essCollection = essHandle ? await getCollection(essHandle).catch(() => null) : null;
+  const essProducts = (essCollection?.products.length ? essCollection.products : [...products].reverse()).slice(0, 10);
+
+  const sec = media["home:collections"];
+  const panels = HOME_COLLECTIONS.map((c, i) => {
+    const m = media[`home:coll:${i}`];
+    return {
+      ...c,
+      label: m?.label || c.label, eyebrow: m?.eyebrow || c.eyebrow, title: m?.title || c.title, text: m?.text || c.text,
+      href: m?.href || c.href, cta: m?.cta,
+      image: m?.url && m.kind === "image" ? m.url : m?.url ? undefined : c.image,
+      video: m?.url && m.kind === "video" ? m.url : undefined,
+    };
+  });
 
   return (
     <>
@@ -58,18 +75,11 @@ export default async function Home() {
 
       <HomeForYou />
 
-      {/* Nouveauté : visuel à gauche, texte + deux produits à droite. Visuel : déposez /public/images/nouveaute.jpg (ou video="/videos/nouveaute.mp4"). */}
-      <LookSection
-        eyebrow="Nouveauté"
-        title="Des rouges à lèvres mats sans transfert, 24 h"
-        href="/collections/maquillage"
-        image="/images/tuile-droite.jpg"
-        chips={["Sans transfert", "Tenue 24 h", "Confort velours"]}
-        products={lips}
-      />
+      {/* Essentiels tendance : rangée de produits. Titre, bouton et lien se changent dans /admin/menu → « Essentiels tendance ». */}
+      <EssentialsRail title={ess?.title || "Essentiels tendance"} intro={ess?.eyebrow || "Les références du moment, choisies pour vous."} cta={ess?.cta || "Voir la sélection"} href={essHref} products={essProducts} />
 
-      {/* La nouvelle icône couture : panneaux de collections. Les visuels et textes se changent dans HOME_COLLECTIONS (src/lib/collections.ts). */}
-      <CollectionsShowcase items={HOME_COLLECTIONS} eyebrow="Parfum" title="La nouvelle icône couture" href="/collections/parfums" />
+      {/* La nouvelle icône couture : panneaux de collections. Visuels et textes : /admin/menu → « Icône couture » (valeurs d'origine dans HOME_COLLECTIONS, src/lib/collections.ts). */}
+      <CollectionsShowcase items={panels} eyebrow={sec?.eyebrow || "Parfum"} title={sec?.title || "La nouvelle icône couture"} href={sec?.href || "/collections/parfums"} cta={sec?.cta || "Découvrir"} />
     </>
   );
 }

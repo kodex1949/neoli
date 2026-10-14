@@ -42,7 +42,7 @@ export default async function AgentsAdminPage() {
 
   return (
     <div className="adm admp">
-      <AdminHead eyebrow="Intelligence" title="Agents IA" lead="Tous les agents démarrent en lecture seule : ils analysent la boutique et proposent, sans rien modifier." />
+      <AdminHead eyebrow="Intelligence" title="Agents IA" lead="Les agents actifs travaillent en continu : un audit automatique toutes les heures, 24 h/24 et 7 j/7. Ils analysent la boutique et proposent ; rien n'est modifié sans votre validation." />
       <AdminStats items={[
         { label: "Agents actifs", value: AGENTS.filter((a) => state.get(a.id)?.enabled).length, note: `sur ${AGENTS.length}` },
         { label: "Actions à valider", value: open.length, hot: open.length > 0 },

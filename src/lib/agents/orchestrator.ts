@@ -86,7 +86,7 @@ export async function runAudit(db: SupabaseClient, opts: RunOptions): Promise<Ru
 
     if (isManager) {
       const report = buildReport(outcomes.filter((o) => o.agent !== "store-manager"));
-      await db.from("agent_reports").insert({ agent_id: "store-manager", kind: opts.trigger === "daily" ? "daily" : "manual", title: `Rapport ${dayKey()} — ${report.headline}`, body: report });
+      await db.from("agent_reports").insert({ agent_id: "store-manager", kind: opts.trigger === "daily" ? "daily" : opts.trigger === "scheduled" ? "scheduled" : "manual", title: `Rapport ${dayKey()} — ${report.headline}`, body: report });
       return { trigger: opts.trigger, outcomes, report };
     }
   }

@@ -19,12 +19,12 @@ export default async function MenuAdminPage() {
         <div className="acct__empty"><h2>Accès réservé</h2><p>Ce compte n'est pas administrateur.</p></div></div>
     );
   }
-  const { data: rows } = await db.from("menu_media").select("slot,kind,url,title,eyebrow,cta,href");
+  const { data: rows } = await db.from("menu_media").select("slot,kind,url,title,eyebrow,cta,href,text,label");
   const media = rowsToMedia(rows ?? []);
   const slots = menuSlots();
   const groups = Array.from(new Set(slots.map((s) => s.group)));
 
-  const custom = Object.values(media).filter((m) => m.url || m.title || m.eyebrow || m.cta || m.href).length;
+  const custom = Object.values(media).filter((m) => m.url || m.title || m.eyebrow || m.cta || m.href || m.text || m.label).length;
 
   return (
     <div className="adm admp mm">
@@ -47,11 +47,14 @@ export default async function MenuAdminPage() {
                 current={media[s.slot]?.url && media[s.slot]?.kind ? { kind: media[s.slot].kind!, url: media[s.slot].url! } : undefined}
                 original={s.original}
                 originalKind={s.originalKind}
-                defaults={{ title: s.title, eyebrow: s.eyebrow, cta: s.cta, href: s.href }}
-                texts={{ title: media[s.slot]?.title, eyebrow: media[s.slot]?.eyebrow, cta: media[s.slot]?.cta, href: media[s.slot]?.href }}
+                defaults={{ title: s.title, eyebrow: s.eyebrow, cta: s.cta, href: s.href, text: s.text, label: s.railLabel }}
+                texts={{ title: media[s.slot]?.title, eyebrow: media[s.slot]?.eyebrow, cta: media[s.slot]?.cta, href: media[s.slot]?.href, text: media[s.slot]?.text, label: media[s.slot]?.label }}
                 hasEyebrow={s.hasEyebrow}
                 hasCta={s.hasCta}
                 titleLabel={s.titleLabel}
+                hasText={s.hasText}
+                hasLabel={s.hasLabel}
+                textOnly={s.textOnly}
               />
             ))}
           </div>
