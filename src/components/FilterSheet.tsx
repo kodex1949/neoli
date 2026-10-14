@@ -17,6 +17,8 @@ export type Filters = { cats: string[]; price: PriceRange; badges: string[] };
 export const NO_FILTERS: Filters = { cats: [], price: "all", badges: [] };
 export const countFilters = (f: Filters) => f.cats.length + (f.price !== "all" ? 1 : 0) + f.badges.length;
 
+type SortOption = { value: string; label: string };
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -25,18 +27,22 @@ type Props = {
   categories: string[];
   badges: string[];
   resultCount: number;
+  sort: string;
+  sortOptions: SortOption[];
+  onSort: (v: string) => void;
 };
 
 const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
-/** Panneau « Filtrer » : même ouverture que le menu (révélé d'un côté, flou du fond). */
-export function FilterSheet({ open, onClose, filters, onChange, categories, badges, resultCount }: Props) {
+/** Panneau « Filtrer & Trier » façon Dior : liste de rubriques, chaque rubrique s'ouvre dans une vue avec retour. */
+export function FilterSheet({ open, onClose, filters, onChange, categories, badges, resultCount, sort, sortOptions, onSort }: Props) {
   const [mounted, setMounted] = useState(false);
+  const [view, setView] = useState<string | null>(null);
   useEffect(() => setMounted(true), []);
   const sheet = useSheetDrag(onClose);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) { setView(null); return; }
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     const prev = document.documentElement.style.overflow;
@@ -46,54 +52,68 @@ export function FilterSheet({ open, onClose, filters, onChange, categories, badg
 
   if (!mounted) return null;
   const n = countFilters(filters);
+  const priceLabel = PRICE_RANGES.find((r) => r.value === filters.price)?.label ?? "";
+  const sortLabel = sortOptions.find((o) => o.value === sort)?.label ?? "";
+
+  const opt = (type: "checkbox" | "radio", checked: boolean, label: string, onToggle: () => void) => (
+    <label key={label} className="filt__opt" data-on={checked}>
+      <span>{label}</span>
+      <input type={type} name={type === "radio" ? `r-${view}` : undefined} checked={checked} onChange={onToggle} />
+      <b aria-hidden="true" data-type={type}><svg viewBox="0 0 12 12"><path d="m2.5 6.2 2.4 2.4 4.6-5" /></svg></b>
+    </label>
+  );
+
+  type Group = { id: string; title: string; summary: string; body: React.ReactNode };
+  const groups: Group[] = [
+    { id: "tri", title: "Trier par", summary: sortLabel, body: sortOptions.map((o) => opt("radio", sort === o.value, o.label, () => onSort(o.value))) },
+  ];
+  if (categories.length > 0) groups.push({ id: "cat", title: "Catégorie", summary: filters.cats.join(", "), body: categories.map((c) => opt("checkbox", filters.cats.includes(c), c, () => onChange({ ...filters, cats: toggle(filters.cats, c) }))) });
+  groups.push({ id: "prix", title: "Prix", summary: filters.price !== "all" ? priceLabel : "", body: PRICE_RANGES.map((r) => opt("radio", filters.price === r.value, r.label, () => onChange({ ...filters, price: r.value }))) });
+  if (badges.length > 0) groups.push({ id: "sel", title: "Sélection", summary: filters.badges.join(", "), body: badges.map((b) => opt("checkbox", filters.badges.includes(b), b, () => onChange({ ...filters, badges: toggle(filters.badges, b) }))) });
+
+  const current = groups.find((g) => g.id === view) ?? null;
+  const counts: Record<string, number> = { tri: 0, cat: filters.cats.length, prix: filters.price !== "all" ? 1 : 0, sel: filters.badges.length };
 
   return createPortal(
     <>
       <div className="sheet__scrim sheet__scrim--menu" data-open={open} onClick={onClose} aria-hidden="true" />
-      <aside className="sheet sheet--menu filt" ref={sheet.ref} data-open={open} role="dialog" aria-label="Filtrer" inert={!open}>
+      <aside className="sheet sheet--menu filt" ref={sheet.ref} data-open={open} role="dialog" aria-label="Filtrer et trier" inert={!open}>
         <div className="sheet__grab" {...sheet.grab} />
-        <div className="sheet__top">
-          <button type="button" className="user__close" onClick={onClose} aria-label="Fermer">
+        <div className="filt__bar">
+          {current ? (
+            <button type="button" className="filt__icon" onClick={() => setView(null)} aria-label="Retour">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6" /></svg>
+            </button>
+          ) : <span className="filt__icon" aria-hidden="true" />}
+          <h2>{current ? current.title : "Filtrer & Trier"}</h2>
+          <button type="button" className="filt__icon" onClick={onClose} aria-label="Fermer">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 17.5 17.5 6.5" /><path d="M6.5 6.5 17.5 17.5" /></svg>
           </button>
         </div>
-        <div className="sheet__tabs"><span className="sheet__tab" aria-selected="true">Filtrer</span></div>
-        <div className="sheet__body">
-          {categories.length > 0 && (
-            <fieldset className="filt__group">
-              <legend>Catégorie</legend>
-              {categories.map((c) => (
-                <label key={c} className="filt__opt">
-                  <input type="checkbox" checked={filters.cats.includes(c)} onChange={() => onChange({ ...filters, cats: toggle(filters.cats, c) })} />
-                  <span>{c}</span>
-                </label>
+
+        <div className="sheet__body filt__body" key={view ?? "root"}>
+          {current ? (
+            <div className="filt__list">{current.body}</div>
+          ) : (
+            <ul className="filt__rows">
+              {groups.map((g) => (
+                <li key={g.id}>
+                  <button type="button" className="filt__row" onClick={() => setView(g.id)}>
+                    <span className="filt__label" data-on={counts[g.id] > 0 || g.id === "tri"}>
+                      {g.title}{counts[g.id] > 0 && <em>({counts[g.id]})</em>}
+                    </span>
+                    {g.summary && <span className="filt__sum">{g.summary}</span>}
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6" /></svg>
+                  </button>
+                </li>
               ))}
-            </fieldset>
-          )}
-          <fieldset className="filt__group">
-            <legend>Prix</legend>
-            {PRICE_RANGES.map((r) => (
-              <label key={r.value} className="filt__opt">
-                <input type="radio" name="price" checked={filters.price === r.value} onChange={() => onChange({ ...filters, price: r.value })} />
-                <span>{r.label}</span>
-              </label>
-            ))}
-          </fieldset>
-          {badges.length > 0 && (
-            <fieldset className="filt__group">
-              <legend>Sélection</legend>
-              {badges.map((b) => (
-                <label key={b} className="filt__opt">
-                  <input type="checkbox" checked={filters.badges.includes(b)} onChange={() => onChange({ ...filters, badges: toggle(filters.badges, b) })} />
-                  <span>{b}</span>
-                </label>
-              ))}
-            </fieldset>
+            </ul>
           )}
         </div>
+
         <div className="filt__foot">
-          <button type="button" className="filt__reset" onClick={() => onChange(NO_FILTERS)} disabled={n === 0}>Réinitialiser</button>
-          <button type="button" className="filt__apply" onClick={onClose}>Voir {resultCount} produit{resultCount > 1 ? "s" : ""}</button>
+          <button type="button" className="filt__reset" onClick={() => onChange(NO_FILTERS)} disabled={n === 0}>Effacer tous les filtres</button>
+          <button type="button" className="filt__apply" onClick={onClose}>Voir les {resultCount} produit{resultCount > 1 ? "s" : ""}</button>
         </div>
       </aside>
     </>,
