@@ -7,11 +7,14 @@ import { NavMenu } from "./NavMenu";
 import { SearchPanel } from "./SearchPanel";
 import { UserPanel } from "./UserPanel";
 import { CartPanel } from "./CartPanel";
+import { FavoritesPanel } from "./FavoritesPanel";
 import { useCart } from "@/lib/cart";
+import { useFavorites } from "@/lib/favorites";
 
 const stroke = { strokeLinecap: "round", strokeLinejoin: "round" } as const;
 
 export function Header() {
+  const { count: favCount } = useFavorites();
   const { count, panelOpen, openPanel, closePanel } = useCart();
   const pathname = usePathname();
   const [atTop, setAtTop] = useState(true);
@@ -60,6 +63,7 @@ export function Header() {
     measure();
     setUserOpen(false);
     closePanel();
+    setFavOpen(false);
     setSearchOpen(true);
   };
   // Panneau compte : ancré à droite, sur l'icône compte
@@ -74,11 +78,31 @@ export function Header() {
     setSearchOpen(false);
     setHover(false);
     closePanel();
+    setFavOpen(false);
     setUserOpen(true);
   };
   const closeUser = useCallback(() => {
     setUserOpen(false);
     userBtn.current?.focus();
+  }, []);
+
+  // Panneau favoris : ancré à droite, sur l'icône cœur
+  const [favOpen, setFavOpen] = useState(false);
+  const [favPos, setFavPos] = useState({ top: 12, right: 20 });
+  const favBtn = useRef<HTMLButtonElement>(null);
+  const openFav = () => {
+    const r = favBtn.current?.getBoundingClientRect();
+    const h = document.querySelector(".header")?.getBoundingClientRect();
+    if (r && h) setFavPos({ top: h.top + 12, right: document.documentElement.clientWidth - r.right - 16 });
+    setSearchOpen(false);
+    setHover(false);
+    setUserOpen(false);
+    closePanel();
+    setFavOpen(true);
+  };
+  const closeFav = useCallback(() => {
+    setFavOpen(false);
+    favBtn.current?.focus();
   }, []);
 
   // Panneau panier : ancré à droite, sur l'icône panier (s'ouvre aussi à l'ajout d'un produit)
@@ -96,6 +120,7 @@ export function Header() {
     setSearchOpen(false);
     setHover(false);
     setUserOpen(false);
+    setFavOpen(false);
     window.addEventListener("resize", place);
     return () => window.removeEventListener("resize", place);
   }, [panelOpen]);
@@ -153,6 +178,17 @@ export function Header() {
               <span className="badge" />
             </button>
             <button
+              ref={favBtn}
+              type="button"
+              className="icon-btn"
+              aria-label={favCount > 0 ? `Mes favoris, ${favCount} produit${favCount > 1 ? "s" : ""}` : "Mes favoris"}
+              aria-expanded={favOpen}
+              onClick={() => (favOpen ? closeFav() : openFav())}
+            >
+              <svg viewBox="0 0 24 24"><path d="M12 19.5s-7-4.3-7-9.4A4 4 0 0 1 12 8a4 4 0 0 1 7 2.1c0 5.1-7 9.4-7 9.4Z" {...stroke} /></svg>
+              {favCount > 0 && <span className="cart-count">{favCount > 9 ? "9+" : favCount}</span>}
+            </button>
+            <button
               ref={cartBtn}
               type="button"
               className="icon-btn"
@@ -170,6 +206,7 @@ export function Header() {
       {/* Hors du <header> : son backdrop-filter piégerait le position: fixed du menu */}
       <NavMenu open={open} onClose={close} />
       <UserPanel open={userOpen} onClose={closeUser} pos={userPos} />
+      <FavoritesPanel open={favOpen} onClose={closeFav} pos={favPos} />
       <CartPanel open={panelOpen} onClose={closeCart} pos={cartPos} />
       <SearchPanel
         open={searchOpen}

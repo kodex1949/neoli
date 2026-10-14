@@ -2243,3 +2243,7 @@ a.acct__card:hover { transform: none; box-shadow: none; border-color: #33383c; }
   .sheet.sheet--menu[data-open="true"] { opacity: 1; transition: none; animation: rev-expand .45s var(--ease-both); }
 }
 @media (prefers-reduced-motion: reduce) { .sheet.sheet--menu[data-open="true"] { animation: none; } }
+
+/* Panneau Favoris */
+.favp__cta { display: grid; place-items: center; text-decoration: none; }
+.favp__add { font-size: 12px; font-weight: 500; color: #33383c; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }

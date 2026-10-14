@@ -4,8 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-type Ctx = { has: (handle: string) => boolean; toggle: (handle: string) => Promise<void>; count: number };
-const FavCtx = createContext<Ctx>({ has: () => false, toggle: async () => {}, count: 0 });
+type Ctx = { has: (handle: string) => boolean; toggle: (handle: string) => Promise<void>; count: number; handles: string[]; loggedIn: boolean | null };
+const FavCtx = createContext<Ctx>({ has: () => false, toggle: async () => {}, count: 0, handles: [], loggedIn: null });
 export const useFavorites = () => useContext(FavCtx);
 
 const configured = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
@@ -17,11 +17,13 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [set, setSet] = useState<Set<string>>(new Set());
   const userId = useRef<string | null>(null);
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
   const load = useCallback(async () => {
     if (!supabase) return;
     const { data: u } = await supabase.auth.getUser();
     userId.current = u.user?.id ?? null;
+    setLoggedIn(Boolean(u.user));
     if (!u.user) { setSet(new Set()); return; }
     const { data } = await supabase.from("favorites").select("handle");
     setSet(new Set((data ?? []).map((r: { handle: string }) => r.handle)));
@@ -46,6 +48,6 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     else router.refresh();
   }, [supabase, set, router, pathname, load]);
 
-  const value = useMemo<Ctx>(() => ({ has: (h) => set.has(h), toggle, count: set.size }), [set, toggle]);
+  const value = useMemo<Ctx>(() => ({ has: (h) => set.has(h), toggle, count: set.size, handles: [...set], loggedIn }), [set, toggle, loggedIn]);
   return <FavCtx.Provider value={value}>{children}</FavCtx.Provider>;
 }
