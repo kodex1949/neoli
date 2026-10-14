@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CollectionView } from "@/components/CollectionView";
 import { COLLECTION_CONTENT, collectionMeta } from "@/lib/collections";
 import { getCollection } from "@/lib/shopify";
+import { siblingLinks } from "@/lib/menu";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -39,6 +40,8 @@ export default async function CollectionPage({ params }: Props) {
       <CollectionView
         products={collection.products}
         blocks={(content?.blocks ?? []).map((b) => ({ ...b }))}
+        links={siblingLinks(handle)}
+        current={`/collections/${handle}`}
       />
     </>
   );

@@ -112,3 +112,15 @@ export const MENU: { items: MenuItem[]; account: { title: string; text: string }
     { label: "Trouver une boutique", href: "/boutiques" },
   ],
 };
+
+/** Liens frères d'une collection (mêmes entrées que le menu) : affichés en pastilles au-dessus de la grille. */
+export function siblingLinks(handle: string): MenuLink[] {
+  const path = `/collections/${handle}`;
+  const top = MENU.items.find((i) => i.href === path && i.submenu);
+  if (top?.submenu) return top.submenu.groups.flat();
+  for (const item of MENU.items) {
+    const group = item.submenu?.groups.find((g) => g.some((l) => l.href === path));
+    if (group) return group;
+  }
+  return [];
+}
