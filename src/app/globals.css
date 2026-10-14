@@ -2521,3 +2521,45 @@ a.collection__chip { display: inline-flex; align-items: center; text-decoration:
   .admp__stats[style*="--n: 4"] .admh__stat:nth-child(-n+2) { border-bottom: 1px solid #e5e5e5 !important; }
 }
 @media (max-width: 700px) { .admp__agents .adm__agents { grid-template-columns: 1fr; } .admp__agents .adm__agent { border-right: 0; } }
+
+/* ───────── Finitions d'interaction (contrôle « design engineering ») ───────── */
+:root { --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1); }
+
+/* Retour au toucher : tout ce qui se presse réagit tout de suite (160 ms), relâché en douceur. */
+.filt__row, .filt__opt, .filt__quick, .filt__apply, .filt__reset, .pf__chips button, .sort__btn, .stories__card, .stories__arrow, .acct__btn, .admx__link, .admh__tile, .admh__stat {
+  transition-property: transform, color, background-color, border-color, opacity, box-shadow;
+  transition-timing-function: var(--ease-out-strong);
+}
+.filt__row:active, .filt__opt:active, .filt__quick:active, .filt__apply:active, .filt__reset:not(:disabled):active, .pf__chips button:active, .acct__btn:not(:disabled):active { transform: scale(0.98); transition-duration: 120ms; }
+.stories__card:active { transform: scale(0.985); transition-duration: 160ms; }
+
+/* Panneaux latéraux et fiches : 500 ms au plus (avant 700–800 ms), voile plus vif. */
+.sheet { transition: transform .5s var(--ease-both), visibility 0s linear .5s; }
+.sheet[data-open="true"] { transition-delay: 0s; }
+.sheet__scrim { transition: opacity .4s var(--ease-both), visibility 0s linear .4s; }
+.sheet__scrim[data-open="true"] { transition-delay: 0s; }
+@media (max-width: 768px) {
+  .sheet { transition: transform .5s var(--ease-both), visibility 0s linear .5s; }
+  .sheet[data-open="true"] { transition-delay: 0s; }
+}
+
+/* Survols : jamais sur écran tactile (un toucher les laisserait « collés »). */
+@media (hover: none) {
+  .stories__card:hover .stories__img img { transform: none; }
+  .stories__card:hover:not(:focus-visible) .stories__go { opacity: 0; transform: translate(-50%, 8px); }
+  .pf__chips button:hover:not([data-on="true"]) { border-color: #e5e5e5; }
+  .filt__reset:hover:not(:disabled) { background: transparent; }
+}
+/* Survol de la carte « Pour vous » : plus court (c'est un geste répété). */
+.stories__img img { transition-duration: .6s; }
+
+/* Champs de prix : 16 px sur téléphone, sinon iOS zoome la page à la saisie. */
+@media (max-width: 768px) { .pf__fields input { font-size: 16px; } }
+
+/* Mouvement réduit : on garde les fondus, on retire les déplacements. */
+@media (prefers-reduced-motion: reduce) {
+  .filt__body, .sheet__sec { animation: none; }
+  .stories__img img, .stories__go { transition: opacity .2s linear; transform: none !important; }
+  .filt__row:active, .filt__opt:active, .filt__apply:active, .pf__chips button:active, .acct__btn:active, .stories__card:active { transform: none; }
+}
+.filt__row, .filt__quick, .stories__card { transition-duration: 160ms; }
