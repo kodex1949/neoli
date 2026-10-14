@@ -33,7 +33,7 @@ export default async function AdminHome() {
   ]);
 
   const stats = [
-    { label: "Avis à valider", value: pending.count ?? 0, href: "/admin/avis", note: `${approved.count ?? 0} publiés`, hot: (pending.count ?? 0) > 0 },
+    { label: "Avis à valider", value: pending.count ?? 0, href: "/admin/avis", note: `${approved.count ?? 0} publié${(approved.count ?? 0) > 1 ? "s" : ""}`, hot: (pending.count ?? 0) > 0 },
     { label: "Actions des agents", value: recs.data?.length ?? 0, href: "/admin/agents", note: `${alerts.count ?? 0} alerte${(alerts.count ?? 0) > 1 ? "s" : ""} non vue${(alerts.count ?? 0) > 1 ? "s" : ""}`, hot: (alerts.count ?? 0) > 0 },
     { label: "Visuels personnalisés", value: media.count ?? 0, href: "/admin/menu", note: `sur ${menuSlots().length} emplacements` },
     { label: "Produits en ligne", value: products.length, href: "https://admin.shopify.com/store/9nwbbg-xh/products", note: "boutique Shopify", ext: true },
