@@ -28,7 +28,7 @@ export type Product = {
   images?: { url: string; alt: string; width: number; height: number }[]; // galerie (fiche produit)
   media?: MediaItem[]; // galerie complète : images + vidéos, dans l'ordre Shopify (fiche produit)
   featuredVideo?: MediaItem; // si le média principal du produit est une vidéo : affichée sur les cartes
-  variants?: { label: string; color?: string; id?: string; price?: string }[]; // déclinaisons affichées sur la carte (teintes ou contenances)
+  variants?: { label: string; color?: string; id?: string; price?: string; measure?: string }[]; // déclinaisons affichées sur la carte (teintes ou contenances)
 };
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN;
@@ -70,7 +70,7 @@ const NODE_FIELDS = /* GraphQL */ `
   featuredImage { url altText width height }
   firstMedia: media(first: 1) { nodes { ${MEDIA_FIELDS} } }
   priceRange { minVariantPrice { amount currencyCode } }
-  variants(first: 6) { nodes { id title price { amount currencyCode } } }
+  variants(first: 6) { nodes { id title price { amount currencyCode } weight weightUnit } }
 `;
 
 const PRODUCTS_QUERY = /* GraphQL */ `
@@ -100,7 +100,7 @@ type Node = {
   id: string; handle: string; title: string; description: string; tags: string[]; productType: string;
   featuredImage: { url: string; altText: string | null; width: number; height: number } | null;
   priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
-  variants: { nodes: { id: string; title: string; price: { amount: string; currencyCode: string } }[] };
+  variants: { nodes: { id: string; title: string; price: { amount: string; currencyCode: string }; weight?: number | null; weightUnit?: string | null }[] };
   images?: { nodes: { url: string; altText: string | null; width: number; height: number }[] };
   firstMedia?: { nodes: MediaNode[] };
   media?: { nodes: MediaNode[] };
@@ -132,6 +132,15 @@ function mapMedia(m: MediaNode, title: string): MediaItem | null {
   return null; // modèles 3D : non gérés
 }
 
+/** Poids de la variante (champ « Poids » de Shopify) sous forme « 200 g » / « 1,2 kg » ; vide si absent ou en unité non métrique. */
+const weightOf = (v?: { weight?: number | null; weightUnit?: string | null }): string | undefined => {
+  if (!v?.weight || v.weight <= 0) return undefined;
+  if (v.weightUnit === "GRAMS") return `${String(v.weight).replace(".", ",")} g`;
+  if (v.weightUnit === "KILOGRAMS") return `${String(v.weight).replace(".", ",")} kg`;
+  return undefined;
+};
+const sizeText = (title: string) => (/default title/i.test(title) ? undefined : title);
+
 const mapNode = (p: Node): Product => ({
   id: p.id,
   handle: p.handle,
@@ -151,8 +160,8 @@ const mapNode = (p: Node): Product => ({
   images: p.images?.nodes.map((i) => ({ url: i.url, alt: i.altText ?? p.title, width: i.width, height: i.height })),
   media: p.media?.nodes.map((m) => mapMedia(m, p.title)).filter((m): m is MediaItem => !!m),
   featuredVideo: (() => { const fm = p.firstMedia?.nodes[0]; const f = fm ? mapMedia(fm, p.title) : null; return f?.type === "video" ? f : undefined; })(),
-  variants: p.variants.nodes.length > 1 ? p.variants.nodes.map((v) => ({ label: v.title, id: v.id, price: money(v.price.amount, v.price.currencyCode) })) : undefined,
-  format: p.tags.find((t) => t.startsWith("format:"))?.slice(7),
+  variants: p.variants.nodes.length > 1 ? p.variants.nodes.map((v) => ({ label: v.title, id: v.id, price: money(v.price.amount, v.price.currencyCode), measure: weightOf(v) })) : undefined,
+  format: p.tags.find((t) => t.startsWith("format:"))?.slice(7) ?? (p.variants.nodes.length === 1 ? sizeText(p.variants.nodes[0].title) ?? weightOf(p.variants.nodes[0]) : undefined),
 });
 
 export async function getProducts(first = 8): Promise<Product[]> {

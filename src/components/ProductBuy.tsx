@@ -20,7 +20,7 @@ export function ProductBuy({ product }: { product: Product }) {
   const root = useRef<HTMLDivElement>(null);
   const v = variants[sel];
   const price = v?.price ?? product.price;
-  const unit = v ? unitPriceOf(v.label, price) : product.format ? unitPriceOf(product.format, price) : null;
+  const unit = v ? unitPriceOf(v.label, price) ?? (v.measure ? unitPriceOf(v.measure, price) : null) : product.format ? unitPriceOf(product.format, price) : null;
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 

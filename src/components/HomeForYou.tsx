@@ -12,6 +12,9 @@ const DURATION = 5500;
 /** « Pour vous » façon stories : pastilles sur l'accueil, puis lecteur plein écran (touchez à gauche / à droite, maintenez pour mettre en pause). */
 export function HomeForYou() {
   const [picks, setPicks] = useState<Pick[]>([]);
+  const [profile, setProfile] = useState<string[]>([]);
+  const track = useRef<HTMLUListElement>(null);
+  const [edge, setEdge] = useState({ start: true, end: true });
   const [open, setOpen] = useState<number | null>(null);
   const [seen, setSeen] = useState<string[]>([]);
 
@@ -19,7 +22,7 @@ export function HomeForYou() {
     let live = true;
     fetch("/api/for-you", { cache: "no-store" })
       .then((r) => r.json())
-      .then((d) => { if (live && Array.isArray(d.picks)) setPicks(d.picks); })
+      .then((d) => { if (!live) return; if (Array.isArray(d.picks)) setPicks(d.picks); if (Array.isArray(d.profile)) setProfile(d.profile); })
       .catch(() => {});
     try { setSeen(JSON.parse(localStorage.getItem(SEEN_KEY) ?? "[]")); } catch {}
     return () => { live = false; };
@@ -34,21 +37,48 @@ export function HomeForYou() {
     });
   }, []);
 
+  // Flèches du carrousel : désactivées aux extrémités
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    const update = () => setEdge({ start: el.scrollLeft < 4, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4 });
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => { el.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
+  }, [picks.length]);
+  const slide = (dir: 1 | -1) => {
+    const el = track.current;
+    if (!el) return;
+    const card = el.querySelector("li")?.getBoundingClientRect().width ?? 300;
+    el.scrollBy({ left: dir * (card + 16) * 2, behavior: "smooth" });
+  };
+
   if (!picks.length) return null;
   return (
     <section className="foru" aria-label="Pour vous">
       <header className="foru__head">
-        <div>
-          <p className="foru__eyebrow">Pour vous</p>
+        <div className="foru__intro">
+          <p className="foru__eyebrow"><span aria-hidden="true" />Pour vous</p>
           <h2 className="foru__title">Sélectionnés selon votre profil olfactif</h2>
+          {profile.length > 0 && (
+            <ul className="foru__profile" aria-label="Votre profil olfactif">
+              {profile.map((x) => <li key={x}>{x}</li>)}
+            </ul>
+          )}
         </div>
-        <Link href="/compte/profil-olfactif" className="foru__link">Modifier mon profil</Link>
+        <div className="foru__tools">
+          <Link href="/compte/profil-olfactif" className="foru__link">Modifier mon profil</Link>
+          <div className="foru__arrows">
+            <button type="button" onClick={() => slide(-1)} disabled={edge.start} aria-label="Précédent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6" /></svg></button>
+            <button type="button" onClick={() => slide(1)} disabled={edge.end} aria-label="Suivant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6" /></svg></button>
+          </div>
+        </div>
       </header>
-      <ul className="stories">
+      <ul className="stories" ref={track}>
         {picks.map(({ product, why }, i) => (
           <li key={product.id}>
             <button type="button" className="stories__card" data-seen={seen.includes(product.id)} onClick={() => setOpen(i)} aria-label={`Voir ${product.title}`}>
-              <span className="stories__bars" aria-hidden="true">{picks.map((_, k) => <i key={k} data-on={k === i} />)}</span>
               <span className="stories__img">
                 {product.featuredVideo?.url ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
@@ -57,14 +87,14 @@ export function HomeForYou() {
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img src={product.image.url} alt="" />
                 ) : null}
+                {why.length > 0 && <span className="stories__tags">{why.slice(0, 2).map((w) => <em key={w}>{w}</em>)}</span>}
+                {product.featuredVideo && <span className="stories__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M8 5.5v13l11-6.5z" /></svg></span>}
+                <span className="stories__go" aria-hidden="true">Voir la story</span>
               </span>
-              {product.featuredVideo && <span className="stories__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5.5v13l11-6.5z" /></svg></span>}
               <span className="stories__meta">
-                {why.length > 0 && <em>{why.slice(0, 2).join(" · ")}</em>}
                 <strong>{product.title}</strong>
                 <span>{product.price}</span>
               </span>
-              <span className="stories__go" aria-hidden="true">Voir la story</span>
             </button>
           </li>
         ))}

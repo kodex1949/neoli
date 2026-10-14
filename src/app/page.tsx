@@ -7,11 +7,24 @@ import { HOME_COLLECTIONS } from "@/lib/collections";
 import { LookSection } from "@/components/LookSection";
 import { HomeForYou } from "@/components/HomeForYou";
 import { IconicsShowcase } from "@/components/IconicsShowcase";
+import { getMenuMedia } from "@/lib/menu-media";
 
 export const revalidate = 60;
 
 export default async function Home() {
   const products = await getProducts(8);
+  const media = await getMenuMedia();
+  const hero = media["home:hero"];
+  const tile = (i: 0 | 1, fallback: { caption: string; href: string; image: string }) => {
+    const m = media[`home:tile:${i}`];
+    return {
+      caption: m?.title || fallback.caption,
+      href: m?.href || fallback.href,
+      cta: m?.cta,
+      image: m?.url && m.kind === "image" ? m.url : m?.url ? undefined : fallback.image,
+      video: m?.url && m.kind === "video" ? m.url : undefined,
+    };
+  };
   const lips = ((await getCollection("maquillage"))?.products ?? products.filter((p) => p.category === "Maquillage")).slice(0, 2);
 
   return (
@@ -20,13 +33,15 @@ export default async function Home() {
           Pour vos médias : mettez vos fichiers dans public/ puis ajoutez, par exemple,
           video="/videos/hero.mp4" poster="/videos/hero.jpg" (et image: "/tile-1.jpg" dans chaque tuile). */}
       <HeroStory
-        eyebrow="Nouvelle collection"
-        title="Le jasmin, nouvel esprit de parfum"
-        href="/collections/parfums"
-        video="/videos/hero.mp4"
+        eyebrow={hero?.eyebrow || "Nouvelle collection"}
+        title={hero?.title || "Le jasmin, nouvel esprit de parfum"}
+        href={hero?.href || "/collections/parfums"}
+        cta={hero?.cta || "Découvrir"}
+        image={hero?.url && hero.kind === "image" ? hero.url : undefined}
+        video={hero?.url ? (hero.kind === "video" ? hero.url : undefined) : "/videos/hero.mp4"}
         tiles={[
-          { caption: "Un extrait de parfum intense", href: "/collections/parfums", image: "/images/tuile-gauche.jpg" },
-          { caption: "Une eau de parfum solaire", href: "/collections/parfums", image: "/images/tuile-droite.jpg" },
+          tile(0, { caption: "Un extrait de parfum intense", href: "/collections/parfums", image: "/images/tuile-gauche.jpg" }),
+          tile(1, { caption: "Une eau de parfum solaire", href: "/collections/parfums", image: "/images/tuile-droite.jpg" }),
         ]}
       />
 

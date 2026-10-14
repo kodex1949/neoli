@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { MENU, type Submenu } from "@/lib/menu";
+import { slotId, type MenuMedia, type MenuMediaItem } from "@/lib/menu-media";
 
-type Props = { open: boolean; onClose: () => void };
+type Props = { open: boolean; onClose: () => void; media?: MenuMedia };
 
 const idx = (i: number) => ({ "--i": i }) as CSSProperties;
 
@@ -17,16 +18,25 @@ const Chevron = ({ dir = "right" }: { dir?: "right" | "left" }) => (
 type CardData = Submenu["cards"][number];
 
 /** Grande image éditoriale du menu mobile (masquée sur ordinateur, où les cartes sont dans la colonne de droite). */
-function Card({ c, i, onGo }: { c: CardData; i: number; onGo: () => void }) {
+/** Vidéo de fond d'une carte / vignette : lecture auto, muette, en boucle. */
+const Clip = ({ src }: { src: string }) => <video className="nav__tile-media" src={src} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" />;
+
+/** Visuel géré dans Supabase s'il existe, sinon visuel d'origine du code. */
+const visual = (m: MenuMediaItem | undefined, image?: string): { bg?: CSSProperties; video?: string } =>
+  m?.url && m.kind === "video" ? { video: m.url } : { bg: m?.url ?? image ? { backgroundImage: `url(${m?.url ?? image})` } : undefined };
+
+function Card({ c, i, onGo, m }: { c: CardData; i: number; onGo: () => void; m?: MenuMediaItem }) {
+  const v = visual(m, c.image);
   return (
-    <Link href={c.href} onClick={onGo} className="nav__tile nav__feature nav__anim" style={{ ...idx(i), ...(c.image ? { backgroundImage: `url(${c.image})` } : null) }}>
-      <span className="caption">{c.eyebrow}</span>
-      <span className="nav__tile-link">{c.title}</span>
+    <Link href={m?.href || c.href} onClick={onGo} className="nav__tile nav__feature nav__anim" style={{ ...idx(i), ...v.bg }}>
+      {v.video && <Clip src={v.video} />}
+      <span className="caption">{m?.eyebrow || c.eyebrow}</span>
+      <span className="nav__tile-link">{m?.title || c.title}</span>
     </Link>
   );
 }
 
-export function NavMenu({ open, onClose }: Props) {
+export function NavMenu({ open, onClose, media = {} }: Props) {
   const [view, setView] = useState<string | null>(null); // id du sous-menu affiché (null = niveau 1)
   const closeRef = useRef<HTMLButtonElement>(null);
   const lastSub = useRef<Submenu | null>(null);
@@ -106,12 +116,16 @@ export function NavMenu({ open, onClose }: Props) {
                   <div className="nav__section nav__anim" style={idx(2)}>
                     <p className="nav__label">Les iconiques</p>
                     <div className="nav__iconics">
-                      {sub.iconics.map((p) => (
-                        <Link key={p.label} href={p.href} onClick={go} className="nav__iconic">
-                          <span className="nav__iconic-img" style={p.image ? { backgroundImage: `url(${p.image})` } : undefined} />
-                          <span>{p.label}</span>
+                      {sub.iconics.map((p, k) => {
+                        const m = media[slotId(view ?? "", "iconic", k)];
+                        const v = visual(m, p.image);
+                        return (
+                        <Link key={p.label} href={m?.href || p.href} onClick={go} className="nav__iconic">
+                          <span className="nav__iconic-img" style={v.bg}>{v.video && <Clip src={v.video} />}</span>
+                          <span>{m?.title || p.label}</span>
                         </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -127,7 +141,7 @@ export function NavMenu({ open, onClose }: Props) {
                 ))}
 
                 {/* sur mobile : les images éditoriales en grand, empilées en bas du menu */}
-                {sub.cards.map((c, k) => <Card key={c.title} c={c} i={8 + k} onGo={go} />)}
+                {sub.cards.map((c, k) => <Card key={c.title} c={c} i={8 + k} onGo={go} m={media[slotId(view ?? "", "card", k)]} />)}
               </>
             ) : (
               <>
@@ -176,19 +190,24 @@ export function NavMenu({ open, onClose }: Props) {
         <aside className="nav__aside" aria-hidden={!sub}>
           {asideSub && (
             <div className="nav__aside-inner" key={asideSub.title}>
-              {asideSub.cards.map((c, i) => (
+              {asideSub.cards.map((c, i) => {
+                const m = media[slotId(MENU.items.find((it) => it.submenu === asideSub)?.id ?? "", "card", i)];
+                const v = visual(m, c.image);
+                return (
                 <Link
                   key={c.title}
-                  href={c.href}
+                  href={m?.href || c.href}
                   onClick={go}
                   className="nav__tile nav__anim"
-                  style={{ ...idx(i + 3), ...(c.image ? { backgroundImage: `url(${c.image})` } : null) }}
+                  style={{ ...idx(i + 3), ...v.bg }}
                   tabIndex={sub ? 0 : -1}
                 >
-                  <span className="caption">{c.eyebrow}</span>
-                  <span className="nav__tile-link">{c.title}</span>
+                  {v.video && <Clip src={v.video} />}
+                  <span className="caption">{m?.eyebrow || c.eyebrow}</span>
+                  <span className="nav__tile-link">{m?.title || c.title}</span>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           )}
         </aside>

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 // Dior bascule l'état « actif » vers 50–60 px de scroll, dans les deux sens.
 const ACTIVATE_AT = 56;
 
-type Tile = { caption: string; href: string; image?: string };
+type Tile = { caption: string; href: string; image?: string; video?: string; cta?: string };
 
 type Props = {
   eyebrow: string;
@@ -16,9 +16,10 @@ type Props = {
   video?: string; // vidéo d'arrière-plan, ex. "/videos/hero.mp4" (fichier dans public/videos/)
   poster?: string; // image affichée avant le chargement de la vidéo
   tiles: [Tile, Tile];
+  cta?: string; // texte du bouton du héros (« Découvrir » par défaut)
 };
 
-export function HeroStory({ eyebrow, title, href, image, video, poster, tiles }: Props) {
+export function HeroStory({ eyebrow, title, href, image, video, poster, tiles, cta = "Découvrir" }: Props) {
   const ref = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [paused, setPaused] = useState(false);
@@ -76,8 +77,9 @@ export function HeroStory({ eyebrow, title, href, image, video, poster, tiles }:
     <section ref={ref} className="story" data-active="false">
       <div className="story__pin">
         <Link href={tiles[0].href} className="story__tile story__tile--start" style={bg(tiles[0].image)}>
+          {tiles[0].video && <video className="story__tile-video" src={tiles[0].video} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" />}
           <span className="story__caption">{tiles[0].caption}</span>
-          <span className="link">Découvrir</span>
+          <span className="link">{tiles[0].cta || "Découvrir"}</span>
         </Link>
 
         <div className="story__visual" style={bg(image ?? poster)}>
@@ -101,7 +103,7 @@ export function HeroStory({ eyebrow, title, href, image, video, poster, tiles }:
           <div className="story__overlay">
             <span className="eyebrow">{eyebrow}</span>
             <h1 className="display">{title}</h1>
-            <Link href={href} className="link">Découvrir</Link>
+            <Link href={href} className="link">{cta}</Link>
           </div>
 
           {video && (
@@ -119,8 +121,9 @@ export function HeroStory({ eyebrow, title, href, image, video, poster, tiles }:
         </div>
 
         <Link href={tiles[1].href} className="story__tile story__tile--end" style={bg(tiles[1].image)}>
+          {tiles[1].video && <video className="story__tile-video" src={tiles[1].video} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" />}
           <span className="story__caption">{tiles[1].caption}</span>
-          <span className="link">Découvrir</span>
+          <span className="link">{tiles[1].cta || "Découvrir"}</span>
         </Link>
       </div>
 

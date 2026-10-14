@@ -35,8 +35,8 @@ export function unitPriceOf(label: string, price: string): string | null {
  * à celui de la carte (sinon la première) ; à défaut, le format du produit (« Spray 50 ml », « Bougie 200 g »). Renvoie null si aucune quantité n'est connue.
  */
 export function unitPrice(p: Product): string | null {
-  const sized = (p.variants ?? []).filter((v) => measure(v.label));
+  const sized = (p.variants ?? []).filter((v) => measure(v.label) || (v.measure && measure(v.measure)));
   const pick = sized.find((v) => (v.price ?? p.price) === p.price) ?? sized[0];
-  if (pick) return unitPriceOf(pick.label, pick.price ?? p.price);
+  if (pick) return unitPriceOf(measure(pick.label) ? pick.label : pick.measure!, pick.price ?? p.price);
   return p.format ? unitPriceOf(p.format, p.price) : null;
 }

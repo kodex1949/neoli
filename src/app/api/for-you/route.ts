@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isScent, recommend } from "@/lib/scent";
+import { FAMILIES, INTENSITY, isScent, recommend } from "@/lib/scent";
 import { getProducts } from "@/lib/shopify";
 import { createClient } from "@/lib/supabase/server";
 
@@ -13,7 +13,11 @@ export async function GET() {
     const scent = data.user?.user_metadata?.scent;
     if (!data.user || !isScent(scent)) return NextResponse.json({ picks: [] });
     const picks = recommend(await getProducts(40), scent, 4);
-    return NextResponse.json({ picks });
+    const profile = [
+      ...FAMILIES.filter((f) => scent.families.includes(f.key)).map((f) => f.label),
+      ...(scent.intensity >= 1 && scent.intensity <= 5 ? [INTENSITY[scent.intensity - 1]] : []),
+    ];
+    return NextResponse.json({ picks, profile });
   } catch {
     return NextResponse.json({ picks: [] });
   }
