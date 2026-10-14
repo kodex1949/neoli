@@ -2451,3 +2451,60 @@ a.collection__chip { display: inline-flex; align-items: center; text-decoration:
   .admh__cols { grid-template-columns: 1fr; }
   .mm__grid { grid-template-columns: 1fr; }
 }
+
+/* ───────── Pages d'administration (avis, visuels, agents) : même langage que le tableau de bord ───────── */
+.admx__main .admp { max-width: 1100px; padding: 72px 56px 112px; gap: 40px; }
+.admp__head { display: grid; }
+.admp__stats { grid-template-columns: repeat(var(--n, 3), 1fr); }
+.admp__stats .admh__stat strong { font-size: 44px; }
+.admp__h2 { margin: 0 0 20px; font-size: 11px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: #1f2326; }
+.admp__body { padding: 24px; }
+.admp__body > p { margin: 0 0 12px; font-size: 14px; color: #4a5154; }
+.admp__body .acct__note { font-size: 12px; color: #7b8487; }
+.admp__bar { align-items: center; }
+.admp__agents .adm__agents { gap: 0; border: 1px solid #e5e5e5; background: #fff; }
+.admp__agents .adm__agent { border: 0; border-right: 1px solid #ececec; box-shadow: none; padding: 24px; }
+.admp__agents .adm__agent:last-child { border-right: 0; }
+.admp__agents .adm__agent h3 { font-family: var(--font-serif); font-weight: 350; font-size: 20px; letter-spacing: -.01em; }
+
+/* Avis */
+.admr__list { display: grid; }
+.admr { display: grid; gap: 10px; padding: 28px 24px; border-bottom: 1px solid #ececec; }
+.admr:last-child { border-bottom: 0; }
+.admr__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.admr__stars { font-size: 15px; letter-spacing: .12em; color: #1f2326; }
+.admr__stars i { font-style: normal; color: #d6d8d9; }
+.admr__status { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #7b8487; }
+.admr__status[data-st="pending"] { color: #c2410c; }
+.admr__status[data-st="approved"] { color: #1f6b3b; }
+.admr__status[data-st="rejected"] { color: #a4262c; }
+.admr__title { margin: 0; font-family: var(--font-serif); font-weight: 350; font-size: 22px; letter-spacing: -.01em; }
+.admr__body { margin: 0; font-size: 14px; line-height: 1.65; color: #4a5154; white-space: pre-line; max-width: 70ch; }
+.admr__meta { margin: 0; font-size: 12px; color: #7b8487; }
+.admr__meta a { color: inherit; text-underline-offset: 3px; }
+.admr__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.admr__actions .acct__btn { height: 40px; padding: 0 22px; }
+.admr__actions .acct__btn[data-danger="true"] { border-color: #e2e2e2; color: #a4262c; }
+.admr__actions .acct__btn[data-danger="true"]:not(:disabled):hover { background: #a4262c; border-color: #a4262c; color: #fff; }
+
+/* Visuels */
+.admx__main .mm__slot { border-radius: 0; border-color: #e5e5e5; padding: 20px; gap: 20px; }
+.admx__main .mm__preview { border-radius: 0; }
+.admx__main .mm__label { font-family: var(--font-serif); font-weight: 350; font-size: 18px; letter-spacing: -.01em; }
+.admx__main .mm__actions .acct__btn { height: 40px; padding: 0 20px; }
+.admx__main .mm__fields input { border-radius: 0; height: 42px; }
+.admx__main .mm__fields label span { font-size: 10px; letter-spacing: .2em; }
+.admx__main .mm__fields input:focus { border-color: #1f2326; }
+
+@media (max-width: 1100px) { .admp__agents .adm__agents { grid-template-columns: 1fr 1fr; } .admp__agents .adm__agent { border-bottom: 1px solid #ececec; } }
+@media (max-width: 1000px) {
+  .admx__main .admp { padding: 40px 20px 80px; gap: 28px; }
+  .admp__stats { grid-template-columns: repeat(var(--n, 3), 1fr); }
+  .admp__stats .admh__stat { padding: 20px 14px; border-bottom: 0 !important; border-right: 1px solid #e5e5e5; }
+  .admp__stats .admh__stat:last-child { border-right: 0; }
+  .admp__stats .admh__stat strong { font-size: 32px; }
+  .admp__stats[style*="--n: 4"] { grid-template-columns: 1fr 1fr; }
+  .admp__stats[style*="--n: 4"] .admh__stat:nth-child(2n) { border-right: 0; }
+  .admp__stats[style*="--n: 4"] .admh__stat:nth-child(-n+2) { border-bottom: 1px solid #e5e5e5 !important; }
+}
+@media (max-width: 700px) { .admp__agents .adm__agents { grid-template-columns: 1fr; } .admp__agents .adm__agent { border-right: 0; } }

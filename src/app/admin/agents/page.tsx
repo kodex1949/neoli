@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AGENTS } from "@/lib/agents/registry";
 import { createClient } from "@/lib/supabase/server";
+import { AdminHead, AdminStats } from "@/components/AdminHead";
 import { ackAlert, decideRecommendation, runAuditAction, setAgentEnabled, setAgentMode } from "./actions";
 
 export const metadata: Metadata = { title: "Agents IA — Néoli", robots: { index: false, follow: false } };
@@ -40,37 +41,39 @@ export default async function AgentsAdminPage() {
   const decided = (recs.data ?? []).filter((r) => r.status !== "open").slice(0, 5);
 
   return (
-    <div className="adm">
-      <header className="acct__head">
-        <p className="acct__eyebrow">Administration</p>
-        <h1 className="acct__title">Agents IA</h1>
-        <p className="acct__lead">Tous les agents démarrent en lecture seule : ils analysent la boutique et proposent, sans rien modifier.</p>
-      </header>
+    <div className="adm admp">
+      <AdminHead eyebrow="Intelligence" title="Agents IA" lead="Tous les agents démarrent en lecture seule : ils analysent la boutique et proposent, sans rien modifier." />
+      <AdminStats items={[
+        { label: "Agents actifs", value: AGENTS.filter((a) => state.get(a.id)?.enabled).length, note: `sur ${AGENTS.length}` },
+        { label: "Actions à valider", value: open.length, hot: open.length > 0 },
+        { label: "Alertes non vues", value: alerts.data?.length ?? 0, hot: (alerts.data?.length ?? 0) > 0 },
+        { label: "Coût IA", value: `${cost.toFixed(2)} ¢`, note: `${tokens} jetons` },
+      ]} />
 
-      <form action={runAuditAction} className="adm__bar">
+      <form action={runAuditAction} className="adm__bar admp__bar">
         <button type="submit" className="acct__btn" data-primary="true">Lancer un audit maintenant</button>
         <span className="acct__note">Une exécution par agent et par heure au maximum (anti-doublon). Aucun appel IA : coût {cost.toFixed(2)} ¢ · {tokens} jetons.</span>
       </form>
 
       {report && (
-        <section className="acct__card"><h2>Dernier rapport · {reports.data?.[0] && when(reports.data[0].created_at)}</h2>
+        <section className="admh__panel admp__sec"><div className="admh__panel-head"><h2>Dernier rapport · {reports.data?.[0] && when(reports.data[0].created_at)}</h2></div><div className="admp__body">
           <p className="adm__headline">{report.headline}</p>
           <p>Critiques : {report.counts?.critical ?? 0} · Attention : {report.counts?.warning ?? 0} · Infos : {report.counts?.info ?? 0}</p>
           {report.priorities?.length ? <ul className="adm__list">{report.priorities.map((p, i) => <li key={i}><b data-sev={p.severity}>{SEV[p.severity as keyof typeof SEV]}</b> {p.title} <em>({p.agent})</em></li>)}</ul> : null}
           {report.problems?.length ? <p className="acct__note">Agents en erreur : {report.problems.map((p) => `${p.agent} (${p.error})`).join(", ")}</p> : null}
-        </section>
+        </div></section>
       )}
 
       {(alerts.data?.length ?? 0) > 0 && (
-        <section className="acct__card"><h2>Alertes importantes</h2>
+        <section className="admh__panel admp__sec"><div className="admh__panel-head"><h2>Alertes importantes</h2></div><div className="admp__body">
           <ul className="adm__list">{alerts.data!.map((a) => (
             <li key={a.id}><b data-sev="critical">Critique</b> {a.message} <em>({a.agent_id} · {when(a.created_at)})</em>
               <form action={ackAlert.bind(null, a.id)} className="adm__inline"><button type="submit" className="adm__link">Marquer comme vue</button></form></li>
           ))}</ul>
-        </section>
+        </div></section>
       )}
 
-      <section className="acct__card"><h2>Actions à valider ({open.length})</h2>
+      <section className="admh__panel admp__sec"><div className="admh__panel-head"><h2>Actions à valider ({open.length})</h2></div><div className="admp__body">
         {open.length === 0 ? <p>Rien en attente.</p> : (
           <ul className="adm__list">{open.map((r) => (
             <li key={r.id}>
@@ -85,9 +88,9 @@ export default async function AgentsAdminPage() {
           ))}</ul>
         )}
         {decided.length > 0 && <p className="acct__note">Dernières décisions : {decided.map((d) => `${d.title} → ${d.status}`).join(" · ")}. Valider enregistre votre accord ; l'application sur la boutique n'est pas encore automatisée.</p>}
-      </section>
+      </div></section>
 
-      <section className="acct__stack"><h2 className="acct__h2">Agents</h2>
+      <section className="admp__agents"><h2 className="admp__h2">Agents</h2>
         <div className="adm__agents">
           {AGENTS.map((a) => {
             const s = state.get(a.id);
@@ -109,13 +112,13 @@ export default async function AgentsAdminPage() {
         </div>
       </section>
 
-      <section className="acct__card"><h2>Historique des tâches</h2>
+      <section className="admh__panel admp__sec"><div className="admh__panel-head"><h2>Historique des tâches</h2></div><div className="admp__body">
         <ul className="adm__list">{(tasks.data ?? []).map((t) => <li key={t.id}><code>{t.agent_id}</code> · {t.trigger} · <b data-st={t.status}>{t.status}</b> · {when(t.created_at)}{t.error ? <em> — {t.error}</em> : null}</li>)}</ul>
-      </section>
+      </div></section>
 
-      <section className="acct__card"><h2>Dernières actions (journal d'audit)</h2>
+      <section className="admh__panel admp__sec"><div className="admh__panel-head"><h2>Dernières actions (journal d'audit)</h2></div><div className="admp__body">
         <ul className="adm__list">{(log.data ?? []).map((l) => <li key={l.id}>{when(l.at)} · <code>{l.agent_id ?? "système"}</code> · {l.action} · {l.result ?? ""}{l.error ? <em> — {l.error}</em> : null}</li>)}</ul>
-      </section>
+      </div></section>
     </div>
   );
 }

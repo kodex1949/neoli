@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { menuSlots, rowsToMedia } from "@/lib/menu-media";
+import { AdminHead, AdminStats } from "@/components/AdminHead";
 import { MenuMediaSlot } from "@/components/MenuMediaSlot";
 
 export const metadata: Metadata = { title: "Visuels du menu — Néoli", robots: { index: false, follow: false } };
@@ -23,17 +24,19 @@ export default async function MenuAdminPage() {
   const slots = menuSlots();
   const groups = Array.from(new Set(slots.map((s) => s.group)));
 
+  const custom = Object.values(media).filter((m) => m.url || m.title || m.eyebrow || m.cta || m.href).length;
+
   return (
-    <div className="adm mm" style={{ maxWidth: 920, margin: "0 auto", padding: "48px 24px 96px", display: "grid", gap: 32 }}>
-      <div>
-        <h1 className="acct__title">Visuels du menu</h1>
-        <p style={{ margin: "8px 0 0", fontSize: 14, color: "#7b8487", lineHeight: 1.6 }}>
-          Changez les visuels (images, vidéos), titres, sous-titres, boutons et liens de la page d'accueil et du menu. Les fichiers sont stockés dans Supabase (50 Mo maximum : JPG, PNG, WebP, AVIF, MP4, WebM). Les vidéos se lisent en boucle, sans son.
-        </p>
-      </div>
+    <div className="adm admp mm">
+      <AdminHead eyebrow="Contenu" title="Visuels & textes" lead="Changez les images, vidéos, titres, sous-titres, boutons et liens de la page d'accueil et du menu. Fichiers stockés dans Supabase (50 Mo maximum : JPG, PNG, WebP, AVIF, MP4, WebM). Les vidéos se lisent en boucle, sans son." />
+      <AdminStats items={[
+        { label: "Emplacements", value: slots.length },
+        { label: "Personnalisés", value: custom, note: "le reste garde l'original" },
+        { label: "Rubriques", value: groups.length },
+      ]} />
       {groups.map((m) => (
         <section key={m} className="mm__group">
-          <h2 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 500 }}>{slots.find((s) => s.group === m)!.groupLabel}</h2>
+          <h2 className="admp__h2">{slots.find((s) => s.group === m)!.groupLabel}</h2>
           <div className="mm__grid">
             {slots.filter((s) => s.group === m).map((s) => (
               <MenuMediaSlot
