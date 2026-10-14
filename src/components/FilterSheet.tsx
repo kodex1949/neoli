@@ -13,9 +13,13 @@ export const PRICE_RANGES: { value: PriceRange; label: string; test: (n: number)
   { value: "gt100", label: "Plus de 100 €", test: (n) => n >= 100 },
 ];
 
-export type Filters = { cats: string[]; price: PriceRange; badges: string[] };
-export const NO_FILTERS: Filters = { cats: [], price: "all", badges: [] };
-export const countFilters = (f: Filters) => f.cats.length + (f.price !== "all" ? 1 : 0) + f.badges.length;
+export type Filters = { cats: string[]; price: PriceRange; badges: string[]; intens: string[]; formats: string[]; sizes: string[]; engrave: boolean };
+export const NO_FILTERS: Filters = { cats: [], price: "all", badges: [], intens: [], formats: [], sizes: [], engrave: false };
+export const countFilters = (f: Filters) => f.cats.length + (f.price !== "all" ? 1 : 0) + f.badges.length + f.intens.length + f.formats.length + f.sizes.length + (f.engrave ? 1 : 0);
+
+/** Valeurs proposées, calculées depuis les produits de la collection. */
+export type FilterFacets = { categories: string[]; badges: string[]; intens: string[]; formats: string[]; sizes: string[]; engraving: boolean };
+export const INTENSITY_LABELS: Record<string, string> = { "1": "1 · Très léger", "2": "2 · Léger", "3": "3 · Modéré", "4": "4 · Intense", "5": "5 · Très intense" };
 
 type SortOption = { value: string; label: string };
 
@@ -24,8 +28,7 @@ type Props = {
   onClose: () => void;
   filters: Filters;
   onChange: (f: Filters) => void;
-  categories: string[];
-  badges: string[];
+  facets: FilterFacets;
   resultCount: number;
   sort: string;
   sortOptions: SortOption[];
@@ -35,7 +38,7 @@ type Props = {
 const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
 /** Panneau « Filtrer & Trier » façon Dior : liste de rubriques, chaque rubrique s'ouvre dans une vue avec retour. */
-export function FilterSheet({ open, onClose, filters, onChange, categories, badges, resultCount, sort, sortOptions, onSort }: Props) {
+export function FilterSheet({ open, onClose, filters, onChange, facets, resultCount, sort, sortOptions, onSort }: Props) {
   const [mounted, setMounted] = useState(false);
   const [view, setView] = useState<string | null>(null);
   useEffect(() => setMounted(true), []);
@@ -51,6 +54,7 @@ export function FilterSheet({ open, onClose, filters, onChange, categories, badg
   }, [open, onClose]);
 
   if (!mounted) return null;
+  const { categories, badges } = facets;
   const n = countFilters(filters);
   const priceLabel = PRICE_RANGES.find((r) => r.value === filters.price)?.label ?? "";
   const sortLabel = sortOptions.find((o) => o.value === sort)?.label ?? "";
@@ -67,12 +71,19 @@ export function FilterSheet({ open, onClose, filters, onChange, categories, badg
   const groups: Group[] = [
     { id: "tri", title: "Trier par", summary: sortLabel, body: sortOptions.map((o) => opt("radio", sort === o.value, o.label, () => onSort(o.value))) },
   ];
-  if (categories.length > 0) groups.push({ id: "cat", title: "Catégorie", summary: filters.cats.join(", "), body: categories.map((c) => opt("checkbox", filters.cats.includes(c), c, () => onChange({ ...filters, cats: toggle(filters.cats, c) }))) });
+  const multi = (id: string, title: string, values: string[], selected: string[], key: "cats" | "badges" | "intens" | "formats" | "sizes", label: (v: string) => string = (v) => v) => {
+    if (values.length === 0) return;
+    groups.push({ id, title, summary: selected.map(label).join(", "), body: values.map((v) => opt("checkbox", selected.includes(v), label(v), () => onChange({ ...filters, [key]: toggle(selected, v) }))) });
+  };
+  multi("cat", "Catégorie", categories, filters.cats, "cats");
   groups.push({ id: "prix", title: "Prix", summary: filters.price !== "all" ? priceLabel : "", body: PRICE_RANGES.map((r) => opt("radio", filters.price === r.value, r.label, () => onChange({ ...filters, price: r.value }))) });
-  if (badges.length > 0) groups.push({ id: "sel", title: "Sélection", summary: filters.badges.join(", "), body: badges.map((b) => opt("checkbox", filters.badges.includes(b), b, () => onChange({ ...filters, badges: toggle(filters.badges, b) }))) });
+  multi("int", "Intensité", facets.intens, filters.intens, "intens", (v) => INTENSITY_LABELS[v] ?? v);
+  multi("fmt", "Format", facets.formats, filters.formats, "formats");
+  multi("size", "Contenance & déclinaison", facets.sizes, filters.sizes, "sizes");
+  multi("sel", "Sélection", badges, filters.badges, "badges");
 
   const current = groups.find((g) => g.id === view) ?? null;
-  const counts: Record<string, number> = { tri: 0, cat: filters.cats.length, prix: filters.price !== "all" ? 1 : 0, sel: filters.badges.length };
+  const counts: Record<string, number> = { tri: 0, cat: filters.cats.length, prix: filters.price !== "all" ? 1 : 0, sel: filters.badges.length, int: filters.intens.length, fmt: filters.formats.length, size: filters.sizes.length };
 
   return createPortal(
     <>
@@ -95,6 +106,14 @@ export function FilterSheet({ open, onClose, filters, onChange, categories, badg
           {current ? (
             <div className="filt__list">{current.body}</div>
           ) : (
+            <>
+            {facets.engraving && (
+              <label className="filt__quick" data-on={filters.engrave}>
+                <input type="checkbox" checked={filters.engrave} onChange={() => onChange({ ...filters, engrave: !filters.engrave })} />
+                <b aria-hidden="true" data-type="checkbox"><svg viewBox="0 0 12 12"><path d="m2.5 6.2 2.4 2.4 4.6-5" /></svg></b>
+                <span>Personnalisable (gravure)</span>
+              </label>
+            )}
             <ul className="filt__rows">
               {groups.map((g) => (
                 <li key={g.id}>
@@ -108,6 +127,7 @@ export function FilterSheet({ open, onClose, filters, onChange, categories, badg
                 </li>
               ))}
             </ul>
+            </>
           )}
         </div>
 

@@ -8,7 +8,7 @@ import { CollectionMedia } from "./CollectionMedia";
 import { CollectionStory } from "./CollectionStory";
 import { ProductCard } from "./ProductCard";
 import { SortMenu } from "./SortMenu";
-import { FilterSheet, NO_FILTERS, PRICE_RANGES, countFilters, type Filters } from "./FilterSheet";
+import { FilterSheet, type FilterFacets, NO_FILTERS, PRICE_RANGES, countFilters, type Filters } from "./FilterSheet";
 
 type Sort = "pertinence" | "prix-asc" | "prix-desc";
 
@@ -30,7 +30,18 @@ export function CollectionView({ products, blocks = [], links = [], current }: {
   const [filterOpen, setFilterOpen] = useState(false);
 
   const categories = useMemo(() => Array.from(new Set(products.map((p) => p.category).filter(Boolean) as string[])), [products]);
-  const badges = useMemo(() => Array.from(new Set(products.flatMap((p) => p.badges ?? []))), [products]);
+  const sizeOf = (p: Product) => (p.variants ?? []).map((v) => v.label).filter((l) => l && !/default title/i.test(l));
+  const facets = useMemo<FilterFacets>(() => {
+    const uniq = (xs: (string | undefined)[]) => Array.from(new Set(xs.filter(Boolean) as string[]));
+    return {
+      categories,
+      badges: uniq(products.flatMap((p) => p.badges ?? [])),
+      intens: uniq(products.map((p) => (p.intensity ? String(p.intensity) : undefined))).sort(),
+      formats: uniq(products.map((p) => p.format)),
+      sizes: uniq(products.flatMap(sizeOf)),
+      engraving: products.some((p) => p.engraving),
+    };
+  }, [products, categories]);
   const active = countFilters(filters);
   const priceTest = PRICE_RANGES.find((r) => r.value === filters.price)?.test ?? (() => true);
 
@@ -39,7 +50,11 @@ export function CollectionView({ products, blocks = [], links = [], current }: {
       (p) =>
         (filters.cats.length === 0 || (p.category && filters.cats.includes(p.category))) &&
         priceTest(value(p)) &&
-        (filters.badges.length === 0 || (p.badges ?? []).some((b) => filters.badges.includes(b))),
+        (filters.badges.length === 0 || (p.badges ?? []).some((b) => filters.badges.includes(b))) &&
+        (filters.intens.length === 0 || (p.intensity !== undefined && filters.intens.includes(String(p.intensity)))) &&
+        (filters.formats.length === 0 || (p.format !== undefined && filters.formats.includes(p.format))) &&
+        (filters.sizes.length === 0 || sizeOf(p).some((s) => filters.sizes.includes(s))) &&
+        (!filters.engrave || !!p.engraving),
     );
     if (sort === "prix-asc") return [...list].sort((a, b) => value(a) - value(b));
     if (sort === "prix-desc") return [...list].sort((a, b) => value(b) - value(a));
@@ -112,7 +127,7 @@ export function CollectionView({ products, blocks = [], links = [], current }: {
         <p className="collection__empty">Aucun produit dans cette sélection pour le moment.</p>
       )}
 
-      <FilterSheet open={filterOpen} onClose={() => setFilterOpen(false)} filters={filters} onChange={setFilters} categories={categories} badges={badges} resultCount={shown.length} sort={sort} onSort={(v) => setSort(v as Sort)} sortOptions={SORT_OPTIONS} />
+      <FilterSheet open={filterOpen} onClose={() => setFilterOpen(false)} filters={filters} onChange={setFilters} facets={facets} resultCount={shown.length} sort={sort} onSort={(v) => setSort(v as Sort)} sortOptions={SORT_OPTIONS} />
     </section>
   );
 }
