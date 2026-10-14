@@ -4,21 +4,13 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useSheetDrag } from "@/lib/sheet";
 
-export type PriceRange = "all" | "lt30" | "30-60" | "60-100" | "gt100";
-export const PRICE_RANGES: { value: PriceRange; label: string; test: (n: number) => boolean }[] = [
-  { value: "all", label: "Tous les prix", test: () => true },
-  { value: "lt30", label: "Moins de 30 €", test: (n) => n < 30 },
-  { value: "30-60", label: "30 € à 60 €", test: (n) => n >= 30 && n < 60 },
-  { value: "60-100", label: "60 € à 100 €", test: (n) => n >= 60 && n < 100 },
-  { value: "gt100", label: "Plus de 100 €", test: (n) => n >= 100 },
-];
-
-export type Filters = { cats: string[]; price: PriceRange; badges: string[]; intens: string[]; formats: string[]; sizes: string[]; engrave: boolean };
-export const NO_FILTERS: Filters = { cats: [], price: "all", badges: [], intens: [], formats: [], sizes: [], engrave: false };
-export const countFilters = (f: Filters) => f.cats.length + (f.price !== "all" ? 1 : 0) + f.badges.length + f.intens.length + f.formats.length + f.sizes.length + (f.engrave ? 1 : 0);
+export type Filters = { cats: string[]; priceMin: number | null; priceMax: number | null; badges: string[]; intens: string[]; formats: string[]; sizes: string[]; engrave: boolean };
+export const NO_FILTERS: Filters = { cats: [], priceMin: null, priceMax: null, badges: [], intens: [], formats: [], sizes: [], engrave: false };
+export const hasPrice = (f: Filters) => f.priceMin !== null || f.priceMax !== null;
+export const countFilters = (f: Filters) => f.cats.length + (hasPrice(f) ? 1 : 0) + f.badges.length + f.intens.length + f.formats.length + f.sizes.length + (f.engrave ? 1 : 0);
 
 /** Valeurs proposées, calculées depuis les produits de la collection. */
-export type FilterFacets = { categories: string[]; badges: string[]; intens: string[]; formats: string[]; sizes: string[]; engraving: boolean };
+export type FilterFacets = { categories: string[]; badges: string[]; intens: string[]; formats: string[]; sizes: string[]; engraving: boolean; prices: number[] };
 export const INTENSITY_LABELS: Record<string, string> = { "1": "1 · Très léger", "2": "2 · Léger", "3": "3 · Modéré", "4": "4 · Intense", "5": "5 · Très intense" };
 
 type SortOption = { value: string; label: string };
@@ -56,7 +48,6 @@ export function FilterSheet({ open, onClose, filters, onChange, facets, resultCo
   if (!mounted) return null;
   const { categories, badges } = facets;
   const n = countFilters(filters);
-  const priceLabel = PRICE_RANGES.find((r) => r.value === filters.price)?.label ?? "";
   const sortLabel = sortOptions.find((o) => o.value === sort)?.label ?? "";
 
   const opt = (type: "checkbox" | "radio", checked: boolean, label: string, onToggle: () => void) => (
@@ -76,14 +67,19 @@ export function FilterSheet({ open, onClose, filters, onChange, facets, resultCo
     groups.push({ id, title, summary: selected.map(label).join(", "), body: values.map((v) => opt("checkbox", selected.includes(v), label(v), () => onChange({ ...filters, [key]: toggle(selected, v) }))) });
   };
   multi("cat", "Catégorie", categories, filters.cats, "cats");
-  groups.push({ id: "prix", title: "Prix", summary: filters.price !== "all" ? priceLabel : "", body: PRICE_RANGES.map((r) => opt("radio", filters.price === r.value, r.label, () => onChange({ ...filters, price: r.value }))) });
+  const lo = facets.prices.length ? Math.floor(Math.min(...facets.prices)) : 0;
+  const hi = facets.prices.length ? Math.ceil(Math.max(...facets.prices)) : 0;
+  if (hi > lo) {
+    const priceSummary = hasPrice(filters) ? `${filters.priceMin ?? lo} € – ${filters.priceMax ?? hi} €` : "";
+    groups.push({ id: "prix", title: "Prix", summary: priceSummary, body: <PriceFilter prices={facets.prices} lo={lo} hi={hi} min={filters.priceMin} max={filters.priceMax} onChange={(a, b) => onChange({ ...filters, priceMin: a, priceMax: b })} /> });
+  }
   multi("int", "Intensité", facets.intens, filters.intens, "intens", (v) => INTENSITY_LABELS[v] ?? v);
   multi("fmt", "Format", facets.formats, filters.formats, "formats");
   multi("size", "Contenance & déclinaison", facets.sizes, filters.sizes, "sizes");
   multi("sel", "Sélection", badges, filters.badges, "badges");
 
   const current = groups.find((g) => g.id === view) ?? null;
-  const counts: Record<string, number> = { tri: 0, cat: filters.cats.length, prix: filters.price !== "all" ? 1 : 0, sel: filters.badges.length, int: filters.intens.length, fmt: filters.formats.length, size: filters.sizes.length };
+  const counts: Record<string, number> = { tri: 0, cat: filters.cats.length, prix: hasPrice(filters) ? 1 : 0, sel: filters.badges.length, int: filters.intens.length, fmt: filters.formats.length, size: filters.sizes.length };
 
   return createPortal(
     <>
@@ -138,5 +134,54 @@ export function FilterSheet({ open, onClose, filters, onChange, facets, resultCo
       </aside>
     </>,
     document.body,
+  );
+}
+
+const fmt = (n: number) => `${Math.round(n)} €`;
+
+/** Sélecteur de prix : histogramme, double curseur, champs min / max et raccourcis. */
+function PriceFilter({ prices, lo, hi, min, max, onChange }: { prices: number[]; lo: number; hi: number; min: number | null; max: number | null; onChange: (a: number | null, b: number | null) => void }) {
+  const span = Math.max(hi - lo, 1);
+  const a = Math.min(Math.max(min ?? lo, lo), hi);
+  const b = Math.min(Math.max(max ?? hi, lo), hi);
+  const commit = (x: number, y: number) => onChange(x <= lo ? null : x, y >= hi ? null : y);
+
+  const BUCKETS = 24;
+  const bars = Array.from({ length: BUCKETS }, () => 0);
+  prices.forEach((p) => { bars[Math.min(BUCKETS - 1, Math.floor(((p - lo) / span) * BUCKETS))]++; });
+  const peak = Math.max(...bars, 1);
+  const pa = ((a - lo) / span) * 100;
+  const pb = ((b - lo) / span) * 100;
+
+  const step = span > 100 ? 5 : 1;
+  const shortcuts = Array.from(new Set([Math.round(lo + span * 0.33), Math.round(lo + span * 0.66)])).filter((v) => v > lo && v < hi);
+  const chips: { label: string; x: number; y: number }[] = [];
+  if (shortcuts[0]) chips.push({ label: `Moins de ${shortcuts[0]} €`, x: lo, y: shortcuts[0] });
+  if (shortcuts[0] && shortcuts[1]) chips.push({ label: `${shortcuts[0]} € à ${shortcuts[1]} €`, x: shortcuts[0], y: shortcuts[1] });
+  if (shortcuts[1]) chips.push({ label: `Plus de ${shortcuts[1]} €`, x: shortcuts[1], y: hi });
+
+  return (
+    <div className="pf">
+      <p className="pf__read" aria-live="polite">{fmt(a)} <i>—</i> {fmt(b)}</p>
+      <div className="pf__chart" aria-hidden="true">
+        {bars.map((c, i) => {
+          const mid = lo + ((i + 0.5) / BUCKETS) * span;
+          return <span key={i} data-in={mid >= a && mid <= b} style={{ height: `${c ? 12 + (c / peak) * 88 : 4}%` }} />;
+        })}
+      </div>
+      <div className="pf__track" style={{ ["--a" as string]: `${pa}%`, ["--b" as string]: `${pb}%` }}>
+        <input type="range" min={lo} max={hi} step={step} value={a} aria-label="Prix minimum" onChange={(e) => commit(Math.min(Number(e.target.value), b), b)} />
+        <input type="range" min={lo} max={hi} step={step} value={b} aria-label="Prix maximum" onChange={(e) => commit(a, Math.max(Number(e.target.value), a))} />
+      </div>
+      <div className="pf__fields">
+        <label><span>Min</span><input type="number" inputMode="numeric" min={lo} max={b} value={Math.round(a)} onChange={(e) => commit(Math.min(Math.max(Number(e.target.value) || lo, lo), b), b)} /><em>€</em></label>
+        <label><span>Max</span><input type="number" inputMode="numeric" min={a} max={hi} value={Math.round(b)} onChange={(e) => commit(a, Math.max(Math.min(Number(e.target.value) || hi, hi), a))} /><em>€</em></label>
+      </div>
+      {chips.length > 0 && (
+        <div className="pf__chips">
+          {chips.map((c) => <button key={c.label} type="button" data-on={a === c.x && b === c.y} onClick={() => commit(c.x, c.y)}>{c.label}</button>)}
+        </div>
+      )}
+    </div>
   );
 }

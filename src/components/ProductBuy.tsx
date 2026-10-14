@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/lib/cart";
 import type { Product } from "@/lib/shopify";
+import { unitPriceOf } from "@/lib/unit-price";
 
 /** Barre d'achat flottante en bas de l'écran : produit, déclinaisons, gravure, ajout au panier, paiement express, boutique. */
 export function ProductBuy({ product }: { product: Product }) {
@@ -19,6 +20,7 @@ export function ProductBuy({ product }: { product: Product }) {
   const root = useRef<HTMLDivElement>(null);
   const v = variants[sel];
   const price = v?.price ?? product.price;
+  const unit = v ? unitPriceOf(v.label, price) : product.format ? unitPriceOf(product.format, price) : null;
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
@@ -133,6 +135,8 @@ export function ProductBuy({ product }: { product: Product }) {
             )}
           </div>
         )}
+
+        {unit && <p className="pdp__unit">{unit}</p>}
 
         {product.engraving && (
           <button type="button" className="pdp__engrave-btn" aria-expanded={engrave} aria-label={note ? `Gravure : ${note}` : "Gravure"} data-set={note ? "true" : "false"} onClick={() => setEngrave((o) => !o)}>

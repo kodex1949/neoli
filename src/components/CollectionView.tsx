@@ -8,7 +8,7 @@ import { CollectionMedia } from "./CollectionMedia";
 import { CollectionStory } from "./CollectionStory";
 import { ProductCard } from "./ProductCard";
 import { SortMenu } from "./SortMenu";
-import { FilterSheet, type FilterFacets, NO_FILTERS, PRICE_RANGES, countFilters, type Filters } from "./FilterSheet";
+import { FilterSheet, type FilterFacets, NO_FILTERS, countFilters, type Filters } from "./FilterSheet";
 
 type Sort = "pertinence" | "prix-asc" | "prix-desc";
 
@@ -40,16 +40,16 @@ export function CollectionView({ products, blocks = [], links = [], current }: {
       formats: uniq(products.map((p) => p.format)),
       sizes: uniq(products.flatMap(sizeOf)),
       engraving: products.some((p) => p.engraving),
+      prices: products.map(value).filter((n) => n > 0),
     };
   }, [products, categories]);
   const active = countFilters(filters);
-  const priceTest = PRICE_RANGES.find((r) => r.value === filters.price)?.test ?? (() => true);
 
   const shown = useMemo(() => {
     const list = products.filter(
       (p) =>
         (filters.cats.length === 0 || (p.category && filters.cats.includes(p.category))) &&
-        priceTest(value(p)) &&
+        (filters.priceMin === null || value(p) >= filters.priceMin) && (filters.priceMax === null || value(p) <= filters.priceMax) &&
         (filters.badges.length === 0 || (p.badges ?? []).some((b) => filters.badges.includes(b))) &&
         (filters.intens.length === 0 || (p.intensity !== undefined && filters.intens.includes(String(p.intensity)))) &&
         (filters.formats.length === 0 || (p.format !== undefined && filters.formats.includes(p.format))) &&
@@ -59,7 +59,7 @@ export function CollectionView({ products, blocks = [], links = [], current }: {
     if (sort === "prix-asc") return [...list].sort((a, b) => value(a) - value(b));
     if (sort === "prix-desc") return [...list].sort((a, b) => value(b) - value(a));
     return list;
-  }, [products, filters, sort, priceTest]);
+  }, [products, filters, sort]);
 
   // Les blocs image / vidéo ne s'affichent que sans filtre, pour ne pas fausser la sélection
   const cells = useMemo(() => {
