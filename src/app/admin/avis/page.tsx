@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AdminHead, AdminStats } from "@/components/AdminHead";
+import { getProduct, getProducts, type Product } from "@/lib/shopify";
 import { decideReview, deleteReview } from "./actions";
 
 export const metadata: Metadata = { title: "Modération des avis — Néoli", robots: { index: false, follow: false } };
@@ -26,24 +27,43 @@ export default async function ReviewsAdminPage() {
   const pending = all.filter((r) => r.status === "pending");
   const done = all.filter((r) => r.status !== "pending");
 
-  const card = (r: (typeof all)[number]) => (
-    <article key={r.id} className="admr">
-      <div className="admr__top">
-        <span className="admr__stars" aria-label={`${r.rating} sur 5`}>{"★".repeat(r.rating)}<i>{"★".repeat(5 - r.rating)}</i></span>
-        <span className="admr__status" data-st={r.status}>{LABEL[r.status as keyof typeof LABEL]}</span>
-      </div>
-      <h3 className="admr__title">{r.title}</h3>
-      <p className="admr__body">{r.body}</p>
-      <p className="admr__meta">
-        {r.author_name} · {when(r.created_at)} · <a href={`/produits/${r.product_handle}`} target="_blank" rel="noreferrer">{r.product_handle}</a>{r.verified ? " · Achat vérifié" : ""}
-      </p>
-      <div className="admr__actions">
-        {r.status !== "approved" && <form action={decideReview.bind(null, r.id, r.product_handle, "approved")}><button className="acct__btn" data-primary="true">Publier</button></form>}
-        {r.status !== "rejected" && <form action={decideReview.bind(null, r.id, r.product_handle, "rejected")}><button className="acct__btn">Refuser</button></form>}
-        <form action={deleteReview.bind(null, r.id, r.product_handle)}><button className="acct__btn" data-danger="true">Supprimer</button></form>
-      </div>
-    </article>
-  );
+  // Produit de chaque avis : miniature + nom (catalogue d'abord, puis fiche par fiche pour les autres).
+  const catalog = await getProducts(100).catch(() => [] as Product[]);
+  const byHandle = new Map<string, Product>(catalog.map((p) => [p.handle, p]));
+  const missing = Array.from(new Set(all.map((r) => r.product_handle as string))).filter((h) => !byHandle.has(h));
+  (await Promise.all(missing.map((h) => getProduct(h).catch(() => null)))).forEach((p) => p && byHandle.set(p.handle, p));
+
+  const card = (r: (typeof all)[number]) => {
+    const prod = byHandle.get(r.product_handle);
+    return (
+      <article key={r.id} className="admr">
+        <a className="admr__prod" href={`/produits/${r.product_handle}`} target="_blank" rel="noreferrer">
+          <span className="admr__thumb">
+            {prod?.image ? <img src={prod.image.url} alt={prod.image.alt || prod.title} loading="lazy" /> : <i aria-hidden="true">N</i>}
+          </span>
+          <span className="admr__pname">
+            <small>Avis sur</small>
+            <b>{prod?.title ?? r.product_handle}</b>
+            <em>Voir la fiche ↗</em>
+          </span>
+        </a>
+        <div className="admr__main">
+          <div className="admr__top">
+            <span className="admr__stars" aria-label={`${r.rating} sur 5`}>{"★".repeat(r.rating)}<i>{"★".repeat(5 - r.rating)}</i></span>
+            <span className="admr__status" data-st={r.status}>{LABEL[r.status as keyof typeof LABEL]}</span>
+          </div>
+          <h3 className="admr__title">{r.title}</h3>
+          {r.body && <p className="admr__body">{r.body}</p>}
+          <p className="admr__meta">{r.author_name} · {when(r.created_at)}{r.verified ? " · Achat vérifié" : ""}</p>
+          <div className="admr__actions">
+            {r.status !== "approved" && <form action={decideReview.bind(null, r.id, r.product_handle, "approved")}><button className="acct__btn" data-primary="true">Publier</button></form>}
+            {r.status !== "rejected" && <form action={decideReview.bind(null, r.id, r.product_handle, "rejected")}><button className="acct__btn">Refuser</button></form>}
+            <form action={deleteReview.bind(null, r.id, r.product_handle)}><button className="acct__btn" data-danger="true">Supprimer</button></form>
+          </div>
+        </div>
+      </article>
+    );
+  };
 
   const published = all.filter((r) => r.status === "approved").length;
   const rejected = all.filter((r) => r.status === "rejected").length;
