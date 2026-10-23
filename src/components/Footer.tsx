@@ -12,20 +12,20 @@ const services: { title: string; text: string; href?: string; icon: React.ReactN
     icon: <><rect x="4.5" y="10.5" width="15" height="10" rx="1.5" /><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" /></> },
   { title: "Retours sous 14 jours", text: "Rétractation simple, selon nos conditions.", href: "/info/retours",
     icon: <><path d="M4.5 9.5V5.5h4" /><path d="M4.8 9.2A8 8 0 1 1 4 13" /></> },
-  { title: "Un conseil, une question ?", text: "Écrivez-nous, nous répondons par e-mail.", href: "mailto:contact@neoli.example",
+  { title: "Un conseil, une question ?", text: "Écrivez-nous, nous répondons par e-mail.", href: "mailto:contact@essnc.example",
     icon: <><path d="M4 6.5h16v11H4z" /><path d="m4.5 7 7.5 6 7.5-6" /></> },
 ];
 
 const perks = [
   { title: "Avantages e-boutique", text: "Échantillons et miniatures offerts avec vos commandes.", href: "/collections/cadeaux" },
   { title: "Exclusivité", text: "Découvrez nos coffrets en édition très limitée.", href: "/collections/exclusifs" },
-  { title: "Cercle Néoli", text: "Gagnez des points à chaque achat et profitez d'avantages réservés aux membres.", href: "/compte/avantages" },
+  { title: "Cercle ESSNC", text: "Gagnez des points à chaque achat et profitez d'avantages réservés aux membres.", href: "/compte/avantages" },
 ];
 
 const cols: { title: string; links: { label: string; href: string }[] }[] = [
   { title: "Trouver une boutique", links: [{ label: "Nos boutiques", href: "#" }, { label: "Prendre rendez-vous", href: "#" }, { label: "Conseil olfactif", href: "/conseil-olfactif" }] },
-  { title: "Service client", links: [{ label: "Contact", href: "mailto:contact@neoli.example" }, { label: "Livraison", href: "/info/livraison" }, { label: "Retours et rétractation", href: "/info/retours" }, { label: "FAQ", href: "/info/faq" }, { label: "La carte cadeau", href: "#" }] },
-  { title: "Néoli", links: [{ label: "Notre histoire", href: "#" }, { label: "Engagements", href: "#" }, { label: "Carrières", href: "#" }, { label: "Presse", href: "#" }] },
+  { title: "Service client", links: [{ label: "Contact", href: "mailto:contact@essnc.example" }, { label: "Livraison", href: "/info/livraison" }, { label: "Retours et rétractation", href: "/info/retours" }, { label: "FAQ", href: "/info/faq" }, { label: "La carte cadeau", href: "#" }] },
+  { title: "ESSNC", links: [{ label: "Notre histoire", href: "#" }, { label: "Engagements", href: "#" }, { label: "Carrières", href: "#" }, { label: "Presse", href: "#" }] },
   { title: "Légal", links: [{ label: "Mentions légales", href: "/info/mentions-legales" }, { label: "Politique de vie privée", href: "/info/confidentialite" }, { label: "Conditions générales de vente", href: "/info/conditions" }, { label: "Accessibilité", href: "#" }, { label: "Préférences de cookies", href: "#" }] },
 ];
 
@@ -90,14 +90,14 @@ export function Footer() {
               {social.map((s) => <li key={s}><Link href="#">{s}</Link></li>)}
             </ul>
           </div>
-          <Link href="/" className="footer__logo" aria-label="Accueil">Néoli</Link>
+          <Link href="/" className="footer__logo" aria-label="Accueil">ESSNC</Link>
           <button type="button" className="footer__country">
             <span>Pays ou région &amp; langue<br /><b>France (Français)</b></span>
             <svg viewBox="0 0 8 12" aria-hidden="true"><path d="m1.5 1 5 5-5 5" /></svg>
           </button>
         </div>
       </div>
-      <p className="footer__legal" data-reveal="fade">© {new Date().getFullYear()} Néoli. Tous droits réservés.</p>
+      <p className="footer__legal" data-reveal="fade">© {new Date().getFullYear()} ESSNC. Tous droits réservés.</p>
     </footer>
   );
 }

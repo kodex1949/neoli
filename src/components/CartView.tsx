@@ -25,7 +25,7 @@ export function CartView({ suggestions }: { suggestions: Product[] }) {
       </div>
 
       <Link href="/compte" className="cart__banner">
-        Connectez-vous pour profiter des avantages du Cercle Néoli
+        Connectez-vous pour profiter des avantages du Cercle ESSNC
       </Link>
       <p className="cart__banner-sub">Bénéficiez de la livraison offerte et d&apos;autres privilèges exclusifs avec votre compte.</p>
 
@@ -95,7 +95,7 @@ export function CartView({ suggestions }: { suggestions: Product[] }) {
           <strong>Nous contacter</strong>
           <span>Un ambassadeur est à votre écoute par message ou par téléphone.</span>
         </div>
-        <a href="mailto:contact@neoli.example" aria-label="Écrire chez Néoli">
+        <a href="mailto:contact@essnc.example" aria-label="Écrire chez ESSNC">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v10H9l-5 4V6Z" /></svg>
         </a>
       </div>

@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/account";
 import { isScent } from "@/lib/scent";
 import { getProducts } from "@/lib/shopify";
 
-export const metadata: Metadata = { title: "Profil olfactif — Néoli" };
+export const metadata: Metadata = { title: "Profil olfactif — ESSNC" };
 
 export default async function ScentPage() {
   const { profile } = await requireUser("/compte/profil-olfactif");

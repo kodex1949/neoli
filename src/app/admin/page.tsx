@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProducts } from "@/lib/shopify";
 import { menuSlots } from "@/lib/menu-media";
 
-export const metadata: Metadata = { title: "Administration — Néoli", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Administration — ESSNC", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 const when = (d: string) => new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(d));

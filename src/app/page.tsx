@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { getCollection, getProducts } from "@/lib/shopify";
-import { ProductCard } from "@/components/ProductCard";
 import { HeroStory } from "@/components/HeroStory";
 import { CollectionsShowcase } from "@/components/CollectionsShowcase";
 import { HOME_COLLECTIONS } from "@/lib/collections";
-import { EssentialsRail } from "@/components/EssentialsRail";
+import { IconicsTabs } from "@/components/IconicsTabs";
 import { HomeForYou } from "@/components/HomeForYou";
 import { IconicsShowcase } from "@/components/IconicsShowcase";
+import { ProductCard } from "@/components/ProductCard";
 import { getMenuMedia } from "@/lib/menu-media";
 
 export const revalidate = 60;
@@ -26,7 +26,9 @@ export default async function Home() {
     };
   };
   // Essentiels tendance : les produits de la collection dont le lien est saisi dans l'admin (/collections/nom), sinon le catalogue.
+  const ic = media["home:iconics"];
   const ess = media["home:essentials"];
+  const essv = media["home:essentials:visual"];
   const essHref = ess?.href || "/collections/best-sellers";
   const essHandle = essHref.match(/^\/collections\/([^/?#]+)/)?.[1];
   const essCollection = essHandle ? await getCollection(essHandle).catch(() => null) : null;
@@ -62,21 +64,28 @@ export default async function Home() {
         ]}
       />
 
-      {/* Les iconiques : média à gauche, carrousel à droite. Le média glisse à gauche quand on fait défiler.
-          Pour une vidéo : media={{ ..., video: "/videos/iconiques.mp4" }} ; pour une image : image: "/images/iconiques.jpg". */}
-      <IconicsShowcase
-        eyebrow="Les iconiques"
-        title="Les incontournables de Néoli"
-        text="Les créations préférées de nos clients : celles que l'on offre, que l'on rachète et que l'on garde."
-        href="/collections/best-sellers"
-      >
-        {products.map((p) => <ProductCard key={p.id} product={p} />)}
+      {/* Les iconiques : version d'origine (visuel à gauche qui défile avec le carrousel de produits). Visuel modifiable dans /admin/menu. */}
+      <IconicsShowcase eyebrow="Sélection" title="Les iconiques" media={{
+        eyebrow: ic?.eyebrow || "Nouvelle collection",
+        title: ic?.title || "Une eau de parfum solaire",
+        href: ic?.href || "/collections/parfums",
+        image: ic?.url && ic.kind === "image" ? ic.url : ic?.url ? undefined : "/images/tuile-droite.jpg",
+        video: ic?.url && ic.kind === "video" ? ic.url : undefined,
+      }}>
+        {products.map((p) => <ProductCard key={p.handle} product={p} />)}
       </IconicsShowcase>
 
       <HomeForYou />
 
       {/* Essentiels tendance : rangée de produits. Titre, bouton et lien se changent dans /admin/menu → « Essentiels tendance ». */}
-      <EssentialsRail title={ess?.title || "Essentiels tendance"} intro={ess?.eyebrow || "Les références du moment, choisies pour vous."} cta={ess?.cta || "Voir la sélection"} href={essHref} products={essProducts} />
+      <IconicsTabs id="ess" plain reverse count={3} moreLabel={ess?.cta || "Voir la sélection"} eyebrow="Sélection" intro={ess?.eyebrow || "Les références du moment, choisies pour vous."} allHandle={essHandle || "best-sellers"} title={ess?.title || "Essentiels tendance"} products={essProducts} media={{
+        eyebrow: essv?.eyebrow || "Sélection",
+        title: essv?.title || "Les essentiels du moment",
+        href: essv?.href || essHref,
+        cta: essv?.cta || "Découvrir",
+        image: essv?.url && essv.kind === "image" ? essv.url : essv?.url ? undefined : "/images/tuile-gauche.jpg",
+        video: essv?.url && essv.kind === "video" ? essv.url : undefined,
+      }} />
 
       {/* La nouvelle icône couture : panneaux de collections. Visuels et textes : /admin/menu → « Icône couture » (valeurs d'origine dans HOME_COLLECTIONS, src/lib/collections.ts). */}
       <CollectionsShowcase items={panels} eyebrow={sec?.eyebrow || "Parfum"} title={sec?.title || "La nouvelle icône couture"} href={sec?.href || "/collections/parfums"} cta={sec?.cta || "Découvrir"} />

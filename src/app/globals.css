@@ -2758,3 +2758,239 @@ a.footer__service:active { transform: scale(0.98); }
 .mm__fields textarea::placeholder { color: #b0b5b8; }
 .mm__fields textarea:focus { outline: none; border-color: #1f2326; }
 .mm__slot[data-textonly="true"] { grid-template-columns: 1fr; }
+/* En-tête : icônes calibrées sur dior.com (pictogramme 24 px, trait fin 1 px, zone cliquable 32 px, 4 px entre les icônes). */
+.icon-btn svg { width: 24px; height: 24px; stroke-width: 1.05; }
+.icon-btn svg path, .icon-btn svg circle { vector-effect: non-scaling-stroke; }
+/* 769–1023 px (tablette) : marges de 8 px, zones de 32 px, 4 px entre les icônes — mesures dior.com à 953 px. */
+@media (min-width: 769px) {
+  .header__inner { padding: 0 8px; }
+  .icon-btn { width: 32px; height: 32px; }
+  .header__side { gap: 4px; }
+  .badge { top: 5px; right: 4px; }
+  .cart-count { top: 2px; right: 0; }
+}
+/* ≥ 1024 px (bureau) : marges de 24 px, zones de 48 px, 8 px entre les icônes de droite, 20 px entre le menu et la recherche — mesures dior.com à 1910 px. */
+@media (min-width: 1024px) {
+  .header__inner { padding: 0 24px; }
+  .icon-btn { width: 48px; height: 48px; }
+  .header__side { gap: 8px; }
+  .header__side:not(.header__side--right) { gap: 20px; }
+  .header__side:not(.header__side--right) .icon-btn + .icon-btn { width: 24px; height: 48px; }
+  .badge { top: 11px; right: 11px; }
+  .cart-count { top: 8px; right: 6px; }
+}
+@media (max-width: 768px) {
+  .icon-btn svg { width: 24px; height: 24px; }
+}
+/* Menu : espacements des blocs « Mon compte » et « Services » calés sur dior.com (liste → filet 24 px → bloc 24 px ; titre → contenu 24 / 16 px). */
+.nav__scroll > .nav__list + .nav__section { margin-top: 27px; padding-top: 24px; }
+.nav__scroll > .nav__list + .nav__section ~ .nav__section { margin-top: 30px; padding-top: 24px; }
+.nav__scroll > .nav__section .nav__label { margin-bottom: 16px; }
+.nav__scroll > .nav__section:has(.nav__card) .nav__label { margin-bottom: 24px; }
+
+/* ───────── Les iconiques : visuel qui suit le produit actif ───────── */
+.icx { --icx-pad: clamp(24px, 3.5vw, 56px); margin-inline: 5%; padding: 96px 0 72px; }
+.icx__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; padding: 0 var(--icx-pad); margin-bottom: 40px; }
+.icx__head .display { margin: 12px 0 0; max-width: 620px; }
+.icx__lede { margin: 16px 0 0; max-width: 460px; font-size: 14px; line-height: 22px; color: #4a5154; text-wrap: pretty; }
+.icx__body { display: grid; grid-template-columns: minmax(280px, 36%) minmax(0, 1fr); gap: 20px; align-items: stretch; padding-left: var(--icx-pad); }
+.icx__stage { position: relative; min-height: 560px; overflow: hidden; background: var(--tile); color: #fff; }
+.icx__frames, .icx__frame { position: absolute; inset: 0; }
+.icx__frame { opacity: 0; transition: opacity .7s var(--ease-both); }
+.icx__frame[data-on="true"] { opacity: 1; }
+.icx__frame img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); transition: transform 1.4s var(--ease-both); }
+.icx__frame[data-on="true"] img { transform: scale(1); }
+.icx__frame[data-pack="true"] { background: linear-gradient(180deg, #f1f1f0 0%, #dcdcdb 100%); }
+.icx__frame[data-pack="true"] img { object-fit: contain; mix-blend-mode: multiply; padding: 10% 12% 28%; box-sizing: border-box; }
+.icx__shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent 55%); pointer-events: none; transition: opacity .5s linear; }
+.icx__stage[data-pack="true"] { color: #1f2326; }
+.icx__stage[data-pack="true"] .icx__shade { opacity: 0; }
+.icx__info { position: absolute; left: 28px; right: 28px; bottom: 28px; display: grid; gap: 8px; animation: icx-in .6s var(--ease-both) backwards; }
+@keyframes icx-in { from { opacity: 0; transform: translateY(12px); } }
+.icx__n { font-size: 12px; letter-spacing: .08em; font-variant-numeric: tabular-nums; opacity: .85; }
+.icx__name { font-family: var(--font-serif); font-weight: 350; font-size: clamp(26px, 2.4vw, 34px); line-height: 1.1; letter-spacing: -.02em; text-wrap: balance; }
+.icx__notes { font-size: 13px; line-height: 19px; opacity: .88; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.icx__buy { display: flex; align-items: baseline; gap: 20px; margin-top: 6px; font-size: 14px; }
+.icx__buy em { font-style: normal; }
+.icx__buy a { padding-bottom: 3px; border-bottom: 1px solid currentColor; font-weight: 500; }
+.icx__rail { min-width: 0; display: flex; flex-direction: column; }
+.icx__track { list-style: none; margin: 0; padding: 0 var(--icx-pad) 0 0; display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; outline: none; flex: 1; align-items: flex-start; }
+.icx__track::-webkit-scrollbar { display: none; }
+.icx__item { flex: 0 0 clamp(200px, 17vw, 280px); scroll-snap-align: start; display: grid; gap: 14px; align-content: start; opacity: .72; transition: opacity .5s var(--ease-both); }
+.icx__item[data-on="true"] { opacity: 1; }
+.icx__item .card { align-content: start; }
+.icx__num { font-size: 12px; letter-spacing: .08em; color: #7b8487; font-variant-numeric: tabular-nums; }
+.icx__stepper { display: flex; gap: 20px; justify-content: flex-end; margin-top: 24px; padding-right: var(--icx-pad); }
+.icx[data-in="false"] .icx__stage { clip-path: inset(0 100% 0 0); }
+.icx[data-in="true"] .icx__stage { clip-path: inset(0); transition: clip-path 1.2s var(--ease-both); }
+.icx[data-in="false"] .icx__item { opacity: 0; transform: translateY(40px); }
+.icx[data-in="true"] .icx__item { transition: opacity .8s var(--ease-both), transform .9s var(--ease-both); transition-delay: calc(.3s + min(var(--i, 0), 6) * 80ms); }
+@media (hover: none) { .icx__item { opacity: 1; } }
+@media (max-width: 900px) {
+  .icx { padding: 64px 0 48px; }
+  .icx__head { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+  .icx__body { grid-template-columns: 1fr; padding-left: 0; gap: 24px; }
+  .icx__stage { min-height: 0; aspect-ratio: 4 / 5; margin-inline: var(--icx-pad); }
+  .icx__track { padding-left: var(--icx-pad); padding-right: var(--icx-pad); scroll-padding-left: var(--icx-pad); }
+  .icx__item { flex-basis: 56vw; }
+  .icx__stepper { justify-content: center; padding-right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .icx__frame, .icx__frame img, .icx__item, .icx__info { transition: none; animation: none; }
+  .icx[data-in="false"] .icx__stage { clip-path: none; } .icx[data-in="false"] .icx__item { opacity: 1; transform: none; }
+}
+/* Iconiques : segments de progression (un par produit), visuel cliquable, alignement bas visuel / rangée. */
+.icx__hit { position: absolute; inset: 0; z-index: 1; }
+.icx__info { z-index: 2; pointer-events: none; }
+.icx__info a { pointer-events: auto; }
+.icx__segs { position: absolute; z-index: 3; top: 20px; left: 28px; right: 28px; display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.icx__segs li { flex: 1; }
+.icx__segs button { display: block; width: 100%; height: 20px; padding: 9px 0; cursor: pointer; }
+.icx__segs i { display: block; height: 2px; background: currentColor; opacity: .35; transition: opacity .5s var(--ease-both), transform .5s var(--ease-both); transform-origin: left; }
+.icx__segs button[data-past="true"] i { opacity: .8; }
+.icx__segs button[data-on="true"] i { opacity: 1; }
+.icx__segs button:active { transform: scale(.98); }
+.icx__stage[data-pack="true"] .icx__segs i { background: #1f2326; }
+.icx__rail { justify-content: space-between; }
+.icx__track { flex: 0 1 auto; }
+.icx__stepper { margin-top: 0; }
+@media (max-width: 900px) { .icx__segs { top: 14px; left: 16px; right: 16px; } .icx__info { left: 18px; right: 18px; bottom: 18px; } }
+
+/* ───────── Les iconiques façon dior.com : visuel à gauche, onglets + 4 tuiles à droite ───────── */
+.icd { margin-inline: 5%; display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); background: #fff; }
+.icd__media { position: relative; min-height: 640px; overflow: hidden; background: #14121a; color: #fff; }
+.icd__media img, .icd__media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.icd__shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, .35), transparent 45%); pointer-events: none; }
+.icd__cap { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 0 32px; text-align: center; }
+.icd__cap span { font-size: 12px; line-height: 14px; letter-spacing: 0; opacity: .9; }
+.icd__cap h3 { margin: 0; max-width: 14ch; font-family: var(--font-serif); font-weight: 350; font-size: clamp(28px, 2.6vw, 38px); line-height: 1.1; letter-spacing: -.02em; text-wrap: balance; }
+.icd__cap a { margin-top: 6px; padding-bottom: 3px; border-bottom: 1px solid currentColor; font-size: 13px; font-weight: 500; transition: transform .16s var(--ease-out-strong, ease-out); }
+.icd__cap a:active { transform: scale(.97); }
+.icd__panel { display: flex; flex-direction: column; align-items: center; padding: 112px clamp(24px, 4vw, 56px) 96px; color: #33383c; }
+.icd__title { margin: 0; font-family: var(--font-serif); font-weight: 350; font-size: 32px; line-height: 42px; letter-spacing: -.02em; text-align: center; }
+.icd__tabs { display: flex; justify-content: center; gap: clamp(28px, 4.4vw, 63px); width: min(100%, 630px); margin-top: 32px; border-bottom: 1px solid #dcdfe0; }
+.icd__tabs button { margin-bottom: -1px; padding: 0 0 12px; font-size: 16px; line-height: 19px; font-weight: 400; color: #33383c; border-bottom: 1px solid transparent; cursor: pointer; transition: border-color .4s var(--ease-both), font-weight .2s linear; }
+.icd__tabs button[aria-selected="true"] { font-weight: 500; border-bottom-color: #33383c; }
+.icd__tabs button:active { transform: scale(.97); }
+.icd__grid { list-style: none; margin: 32px 0 0; padding: 0; width: min(100%, 630px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; animation: icd-in .6s var(--ease-both) backwards; }
+@keyframes icd-in { from { opacity: 0; transform: translateY(14px); } }
+.icd__tile { display: grid; justify-items: center; align-content: start; text-align: center; }
+.icd__img { position: relative; display: block; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; background: #f1f1f0; }
+.icd__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease-out-strong, ease-out); }
+.icd__img[data-pack="true"] { background: linear-gradient(180deg, #f1f1f0 0%, #dcdcdb 100%); }
+.icd__img[data-pack="true"] img { object-fit: contain; mix-blend-mode: multiply; padding: 12% 10%; box-sizing: border-box; }
+@media (hover: hover) and (pointer: fine) { .icd__tile:hover .icd__img img { transform: scale(1.04); } }
+.icd__name { margin-top: 15px; padding: 0 6px; font-size: 14px; line-height: 17px; font-weight: 500; color: #33383c; text-wrap: balance; }
+.icd__price { margin-top: 8px; font-size: 14px; line-height: 17px; color: #5d676c; font-variant-numeric: tabular-nums; }
+.icd__order { margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 9px; border-radius: 6px; background: #fff; border: 1px solid #fff; box-shadow: 0 4px 80px rgba(1, 1, 1, .12); font-size: 12px; font-weight: 500; color: #33383c; cursor: pointer; transition: box-shadow .5s var(--ease-both), transform .16s var(--ease-out-strong, ease-out); }
+.icd__order svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; }
+.icd__order:hover { box-shadow: 0 4px 40px rgba(1, 1, 1, .2); }
+.icd__order:active { transform: scale(.96); }
+.icd__more { margin-top: 49px; padding-bottom: 3px; border-bottom: 1px solid #33383c; font-size: 14px; line-height: 17px; font-weight: 500; color: #33383c; transition: transform .16s var(--ease-out-strong, ease-out); }
+.icd__more:active { transform: scale(.97); }
+@media (max-width: 900px) {
+  .icd { grid-template-columns: 1fr; }
+  .icd__media { min-height: 0; aspect-ratio: 4 / 5; max-height: 80svh; }
+  .icd__panel { padding: 56px 20px 64px; }
+  .icd__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 8px; }
+  .icd__tabs { gap: 24px; overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
+  .icd__tabs::-webkit-scrollbar { display: none; }
+  .icd__tabs button { white-space: nowrap; }
+}
+@media (prefers-reduced-motion: reduce) { .icd__grid { animation: none; } .icd__img img, .icd__order, .icd__cap a, .icd__more { transition: none; } }
+.icd__grid, .icd__tabs { width: min(100%, 760px); }
+.icd__name { min-height: 34px; }
+.icd__tile { grid-template-rows: auto auto auto 1fr; }
+
+.icd[data-reverse="true"] .icd__media { order: 2; }
+.icd[data-reverse="true"] { grid-template-columns: minmax(0, 54fr) minmax(0, 46fr); }
+@media (max-width: 900px) { .icd[data-reverse="true"] { grid-template-columns: 1fr; } .icd[data-reverse="true"] .icd__media { order: 0; } }
+
+/* Ajustements mesurés sur dior.com (viewport 1920) : visuel 37 % / panneau 63 %, tuiles 210×315 sur toute la largeur du panneau,
+   tuiles sans effet au survol, changement d'onglet 0,5 s cubic-bezier(.31,0,.13,1), onglets soulignés sur leur seule largeur. */
+.icd { grid-template-columns: minmax(0, 37fr) minmax(0, 63fr); }
+.icd[data-reverse="true"] { grid-template-columns: minmax(0, 63fr) minmax(0, 37fr); }
+.icd__media { min-height: 0; aspect-ratio: 710 / 1156; }
+.icd__panel { padding: clamp(80px, 13vw, 255px) 14% clamp(80px, 13vw, 255px); }
+.icd__tabs { width: auto; gap: clamp(28px, 3.3vw, 63px); }
+.icd__tabs button { padding-inline: 2px; }
+.icd__grid { width: 100%; max-width: 853px; animation-duration: .5s; animation-timing-function: cubic-bezier(.31, 0, .13, 1); }
+@media (hover: hover) and (pointer: fine) { .icd__tile:hover .icd__img img { transform: none; } }
+@media (max-width: 900px) {
+  .icd, .icd[data-reverse="true"] { grid-template-columns: 1fr; }
+  .icd__media { aspect-ratio: 4 / 5; }
+  .icd__panel { padding: 56px 20px 64px; }
+  .icd__tabs { width: 100%; }
+}
+
+/* Variante « Les cadeaux d'exception » de dior.com : articles à gauche (surtitre, titre, phrase, 3 tuiles), visuel plein cadre à droite */
+.icd--plain, .icd--plain[data-reverse="true"] { grid-template-columns: minmax(0, 55fr) minmax(0, 45fr); }
+.icd--plain .icd__media { aspect-ratio: auto; min-height: 0; background: #ece9e6; }
+.icd--plain .icd__panel { padding: clamp(72px, 10.5vw, 202px) 19%; }
+.icd__eyebrow { margin: 0 0 4px; font-size: 12px; line-height: 14px; font-weight: 500; color: #7b8487; text-align: center; }
+.icd__intro { margin: 28px 0 0; font-size: 14px; line-height: 22px; color: #7b8487; text-align: center; text-wrap: balance; }
+.icd--plain .icd__title { line-height: 42px; }
+.icd--plain .icd__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 650px; margin-top: 32px; }
+.icd--plain .icd__img { background: #f1f1f2; }
+.icd--plain .icd__more { margin-top: 38px; }
+@media (max-width: 900px) {
+  .icd--plain, .icd--plain[data-reverse="true"] { grid-template-columns: 1fr; }
+  .icd--plain .icd__media { order: 0; aspect-ratio: 4 / 5; }
+  .icd--plain .icd__panel { padding: 56px 20px 64px; }
+  .icd--plain .icd__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+}
+
+/* Animations relevées sur dior.com : tout passe par .5 s cubic-bezier(.31,0,.13,1) ; « Commander » et les tuiles ne bougent pas au survol ;
+   les liens soulignés se redessinent (le trait sort à droite, un nouveau entre depuis la gauche) ; vidéo avec boutons son / pause en bas à gauche. */
+.icd { --dior-ease: cubic-bezier(.31, 0, .13, 1); }
+.icd__more, .icd__cap a {
+  border-bottom: 0; padding-bottom: 4px;
+  background: linear-gradient(to right, currentColor, currentColor) -10px 100% / 0% 1px no-repeat, linear-gradient(to right, currentColor, currentColor) 100% 100% / 100% 1px no-repeat;
+  transition: background-size .5s var(--dior-ease), background-position .5s var(--dior-ease), transform .16s var(--ease-out-strong, ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .icd__more:hover, .icd__cap a:hover { background-size: 100% 1px, 0% 1px; background-position: 0 100%, 100% 100%; }
+}
+.icd__order, .icd__order:hover { box-shadow: 0 4px 80px rgba(1, 1, 1, .12); transition: transform .16s var(--ease-out-strong, ease-out); }
+.icd__tabs button { transition: border-color .5s var(--dior-ease), font-weight .5s var(--dior-ease); }
+.icd__ctl { position: absolute; left: 12px; bottom: 12px; z-index: 2; display: flex; gap: 4px; }
+.icd__ctl button { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 4px; background: rgba(51, 56, 60, .5); color: #fff; cursor: pointer; transition: background .3s var(--dior-ease), transform .16s var(--ease-out-strong, ease-out); }
+.icd__ctl button:hover { background: rgba(51, 56, 60, .75); }
+.icd__ctl button:active { transform: scale(.94); }
+.icd__ctl svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.icd__ctl svg path:first-child:only-child[d^="m9"] { fill: currentColor; }
+@media (prefers-reduced-motion: reduce) { .icd__more, .icd__cap a, .icd__ctl button { transition: none; } }
+/* Comme dior.com : cette section va d'un bord à l'autre de l'écran */
+.icd--plain { margin-inline: 0; }
+/* Couleurs relevées sur dior.com : fond de page #f8f8f8, fond des visuels produit #f3f3f3 */
+.icd--plain { background: #f8f8f8; }
+.icd--plain .icd__img { background: #f3f3f3; }
+.icd--plain .icd__img[data-pack="true"] { background: #f3f3f3; }
+
+/* Animation du héros de dior.com, reprise pour cette section : au défilement, le visuel passe d'un grand cadre centré à sa colonne (--q 1 → 0) et le texte apparaît */
+.icd__bleed { position: absolute; inset: 0; overflow: hidden; }
+.icd__bleed img, .icd__bleed video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.icd--plain { --q: 0; position: relative; overflow: hidden; }
+.icd--plain .icd__media { overflow: visible; background: transparent; }
+.icd--plain .icd__bleed { z-index: 2; background: #14121a; inset: calc(var(--q) * 7%) calc(var(--q) * 13.3%) calc(var(--q) * 7%) calc(var(--q) * -109%); }
+.icd--plain .icd__panel { opacity: calc(1 - var(--q)); transform: translateY(calc(var(--q) * 28px)); }
+.icd--plain .icd__ctl { z-index: 3; }
+@media (max-width: 900px) { .icd--plain { --q: 0 !important; } .icd--plain .icd__media { overflow: hidden; } }
+
+/* Défilement « collé » : la section reste à l'écran sur le premier visuel, puis le visuel se range à droite et les produits apparaissent */
+.icd-pin { height: 220svh; }
+.icd-pin > .icd--plain { position: sticky; top: 0; height: 100svh; grid-template-rows: minmax(0, 1fr); }
+.icd--plain .icd__panel { justify-content: center; padding-block: 72px; }
+@media (max-width: 900px) {
+  .icd-pin { height: auto; }
+  .icd-pin > .icd--plain { position: relative; height: auto; }
+  .icd--plain .icd__panel { padding-block: 56px 64px; }
+}
+
+/* Légende et boutons du visuel, comme sur le héros de dior.com : surtitre 12 px, titre serif 40 px, « Découvrir » souligné, son et pause en bas à gauche */
+.icd--plain .icd__shade { background: linear-gradient(to top, rgba(0,0,0,.18), rgba(0,0,0,.04) 55%, transparent); }
+.icd--plain .icd__cap { gap: 18px; }
+.icd--plain .icd__cap span { font-size: 12px; line-height: 14px; font-weight: 500; opacity: 1; }
+.icd--plain .icd__cap h3 { max-width: 16ch; font-weight: 350; font-size: clamp(28px, 2.6vw, 40px); line-height: 1.1; letter-spacing: -.02em; }
+.icd--plain .icd__cap a { font-size: 14px; font-weight: 500; }
+.icd__ctl { left: 12px; bottom: 12px; }

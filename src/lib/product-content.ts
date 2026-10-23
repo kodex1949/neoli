@@ -24,11 +24,11 @@ export const ACCORDIONS: { title: string; text: string; points?: string[] }[] = 
 export const PERKS = ["Service d'essai : un échantillon offert", "Emballage cadeau offert", "Livraison offerte dès 100 €"];
 
 export const FALLBACK_TEXT =
-  "Une création de Néoli, pensée pour durer. Ses notes se dévoilent par touches successives, de la première vaporisation jusqu'au sillage. Pièce favorite qui s'assortit d'un rien et s'assemble avec tout, elle révèle l'évidence d'une signature sans artifice, presque dépouillée : l'incarnation pure d'une élégance universelle.";
+  "Une création d'ESSNC, pensée pour durer. Ses notes se dévoilent par touches successives, de la première vaporisation jusqu'au sillage. Pièce favorite qui s'assortit d'un rien et s'assemble avec tout, elle révèle l'évidence d'une signature sans artifice, presque dépouillée : l'incarnation pure d'une élégance universelle.";
 
 export function editorial(title: string, tagline?: string): { wide: Media; split: Media } {
   return {
     wide: { image: "/images/tuile-gauche.jpg", eyebrow: "L'atelier", title: `La silhouette de ${title}`, tone: "light" },
-    split: { image: "/images/tuile-droite.jpg", eyebrow: "Le parfum", title: `Une signature : ${title}`, text: tagline ?? "Une composition singulière, signée de Néoli." },
+    split: { image: "/images/tuile-droite.jpg", eyebrow: "Le parfum", title: `Une signature : ${title}`, text: tagline ?? "Une composition singulière, signée d'ESSNC." },
   };
 }

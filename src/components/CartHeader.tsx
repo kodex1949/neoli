@@ -16,7 +16,7 @@ export function CartHeader() {
         <svg viewBox="0 0 8 12" aria-hidden="true"><path d="m6.5 1-5 5 5 5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
         Retour
       </button>
-      <Link href="/" className="logo" aria-label="Accueil">Néoli</Link>
+      <Link href="/" className="logo" aria-label="Accueil">ESSNC</Link>
       <span />
     </header>
   );

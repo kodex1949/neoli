@@ -13,7 +13,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const TITLES: Record<Mode, { h: string; p: string; cta: string }> = {
   login: { h: "Connexion", p: "Accédez à votre compte pour suivre vos commandes et retrouver vos favoris.", cta: "Se connecter" },
-  signup: { h: "Créer un compte", p: "Rejoignez le Cercle Néoli : avantages, échantillons et invitations exclusives.", cta: "Créer mon compte" },
+  signup: { h: "Créer un compte", p: "Rejoignez le Cercle ESSNC : avantages, échantillons et invitations exclusives.", cta: "Créer mon compte" },
   reset: { h: "Mot de passe oublié", p: "Entrez votre e-mail : nous vous envoyons un lien pour choisir un nouveau mot de passe.", cta: "Envoyer le lien" },
 };
 

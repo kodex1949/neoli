@@ -165,7 +165,7 @@ export function Header({ menuMedia = {} }: { menuMedia?: MenuMedia }) {
             </button>
           </div>
 
-          <Link href="/" className="logo" aria-label="Accueil">Néoli</Link>
+          <Link href="/" className="logo" aria-label="Accueil">ESSNC</Link>
 
           <div className="header__side header__side--right">
             <button

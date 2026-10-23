@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { loyalty, referralBonus, TIERS } from "@/lib/loyalty";
 import { getOrdersByEmail } from "@/lib/shopify-admin";
 
-export const metadata: Metadata = { title: "Mes avantages — Néoli" };
+export const metadata: Metadata = { title: "Mes avantages — ESSNC" };
 
 export default async function PerksPage() {
   const { user, profile } = await requireUser("/compte/avantages");
@@ -18,7 +18,7 @@ export default async function PerksPage() {
   return (
     <>
       <header className="acct__head">
-        <p className="acct__eyebrow">Cercle Néoli</p>
+        <p className="acct__eyebrow">Cercle ESSNC</p>
         <h1 className="acct__title">Mes avantages</h1>
         <p className="acct__lead">Chaque achat vous rapproche du palier suivant et de nouveaux privilèges.</p>
       </header>

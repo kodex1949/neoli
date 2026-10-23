@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminHead, AdminStats } from "@/components/AdminHead";
 import { ackAlert, decideRecommendation, runAuditAction, setAgentEnabled, setAgentMode } from "./actions";
 
-export const metadata: Metadata = { title: "Agents IA — Néoli", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Agents IA — ESSNC", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 const MODES = { read_only: "READ ONLY", approval_required: "APPROVAL REQUIRED", auto_execute: "AUTO EXECUTE" } as const;

@@ -4,7 +4,7 @@ import { OrderCard } from "@/components/account/OrderCard";
 import { requireUser } from "@/lib/account";
 import { getOrdersByEmail } from "@/lib/shopify-admin";
 
-export const metadata: Metadata = { title: "Mes commandes — Néoli" };
+export const metadata: Metadata = { title: "Mes commandes — ESSNC" };
 
 export default async function OrdersPage() {
   const { user } = await requireUser("/compte/commandes");

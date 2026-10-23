@@ -5,7 +5,7 @@ import { menuSlots, rowsToMedia } from "@/lib/menu-media";
 import { AdminHead, AdminStats } from "@/components/AdminHead";
 import { MenuMediaSlot } from "@/components/MenuMediaSlot";
 
-export const metadata: Metadata = { title: "Visuels du menu — Néoli", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Visuels du menu — ESSNC", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 export default async function MenuAdminPage() {

@@ -16,7 +16,7 @@ type Props = { params: Promise<{ handle: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params;
   const p = await getProduct(handle);
-  return { title: p ? `${p.title} — Néoli` : "Produit — Néoli", description: p?.tagline };
+  return { title: p ? `${p.title} — ESSNC` : "Produit — ESSNC", description: p?.tagline };
 }
 
 export default async function ProductPage({ params }: Props) {

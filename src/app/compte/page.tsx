@@ -8,7 +8,7 @@ import { loyalty, referralBonus } from "@/lib/loyalty";
 import { createClient } from "@/lib/supabase/server";
 import { getOrdersByEmail } from "@/lib/shopify-admin";
 
-export const metadata: Metadata = { title: "Mon compte — Néoli" };
+export const metadata: Metadata = { title: "Mon compte — ESSNC" };
 
 const fmt = (d?: string) => (d ? new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(d)) : "—");
 
@@ -40,7 +40,7 @@ export default async function AccountPage() {
 
       <div className="acct__tier">
         <div>
-          <p className="acct__eyebrow">Cercle Néoli</p>
+          <p className="acct__eyebrow">Cercle ESSNC</p>
           <p className="acct__tier-name">{L.tier.name}</p>
         </div>
         <dl>

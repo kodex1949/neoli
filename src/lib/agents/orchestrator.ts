@@ -3,11 +3,16 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { AGENTS } from "./registry";
 import { PermissionError } from "./guard";
 import { audit, costToday, dayKey, hourKey, saveFindings, type AgentRow } from "./store";
-import { envReport, fetchCatalog, fetchOrders, probePage, runIntegrationChecks, runSiteChecks, type Ctx } from "./sources";
+import { envReport, fetchCatalog, fetchCollectionsHealth, fetchOrders, fetchOrderStatuses, fetchReviews, fetchStock, probePage, runIntegrationChecks, runSiteChecks, type Ctx } from "./sources";
 import { analyzeCatalog } from "./analyzers/product";
 import { analyzeSeo } from "./analyzers/seo";
 import { analyzeSales, computeStats } from "./analyzers/analytics";
 import { analyzeTechnical } from "./analyzers/technical";
+import { analyzeStock } from "./analyzers/inventory";
+import { analyzePricing } from "./analyzers/pricing";
+import { analyzeOrders } from "./analyzers/orders";
+import { analyzeSupport } from "./analyzers/support";
+import { analyzeMarketing } from "./analyzers/marketing";
 import { buildReport, type AgentOutcome } from "./analyzers/manager";
 import type { AgentDef, Finding } from "./types";
 
@@ -19,7 +24,7 @@ const TIMEOUT_MS = 45_000;
 const withTimeout = <T,>(p: Promise<T>) => Promise.race([p, new Promise<T>((_, rej) => setTimeout(() => rej(new Error("délai dépassé")), TIMEOUT_MS))]);
 
 /** Tâche de chaque agent spécialisé. Le Store Manager est traité à part, une fois les autres terminés. */
-async function perform(def: AgentDef, ctx: Ctx): Promise<Finding[]> {
+async function perform(def: AgentDef, ctx: Ctx, db: SupabaseClient): Promise<Finding[]> {
   switch (def.id) {
     case "product-manager": return analyzeCatalog(await fetchCatalog(ctx));
     case "seo-specialist": {
@@ -38,6 +43,25 @@ async function perform(def: AgentDef, ctx: Ctx): Promise<Finding[]> {
     case "technical-quality": {
       const checks = [...await runSiteChecks(ctx, ["/", "/collections/parfums", "/connexion", "/panier", "/api/search"]), ...await runIntegrationChecks(ctx)];
       return analyzeTechnical(checks, envReport(), false);
+    }
+    case "inventory-manager": {
+      const { items, denied } = await fetchStock(ctx);
+      return analyzeStock(items, denied);
+    }
+    case "pricing-manager": {
+      const catalog = await fetchCatalog(ctx, 0);
+      const orders = await fetchOrders(ctx).then((r) => r.orders).catch(() => null);
+      return analyzePricing(catalog, orders);
+    }
+    case "order-manager": {
+      const { orders, denied } = await fetchOrderStatuses(ctx);
+      return analyzeOrders(orders, denied);
+    }
+    case "customer-support": return analyzeSupport(await fetchReviews(ctx, db));
+    case "marketing-manager": {
+      const [catalog, collections, reviews, sales] = await Promise.all([fetchCatalog(ctx, 0), fetchCollectionsHealth(ctx), fetchReviews(ctx, db).catch(() => []), fetchOrders(ctx).then((r) => computeStats(r.orders)).catch(() => null)]);
+      const reviewed = new Set(reviews.filter((r) => r.status === "approved").map((r) => r.product_handle));
+      return analyzeMarketing({ collections, bestSellers: sales?.bestSellers ?? [], productsWithoutReviews: catalog.filter((p) => !reviewed.has(p.handle)).map((p) => p.handle), productCount: catalog.length });
     }
     default: throw new Error("agent non implémenté");
   }
@@ -70,7 +94,7 @@ export async function runAudit(db: SupabaseClient, opts: RunOptions): Promise<Ru
       attempts++;
       try {
         if (isManager) { findings = []; break; }
-        findings = await withTimeout(perform(def, ctx)); error = undefined; break;
+        findings = await withTimeout(perform(def, ctx, db)); error = undefined; break;
       } catch (e) {
         error = e instanceof Error ? e.message : String(e);
         if (e instanceof PermissionError) break; // inutile de réessayer un refus

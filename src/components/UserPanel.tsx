@@ -115,7 +115,7 @@ export function UserPanel({ open, onClose, pos }: Props) {
           ) : (
             <div className="user__body">
               <h2 className="user__title">Connectez-vous ou créez un compte</h2>
-              <p className="user__lead">Entrez votre adresse e-mail pour vous connecter ou créer un compte et devenir membre du Cercle Néoli.</p>
+              <p className="user__lead">Entrez votre adresse e-mail pour vous connecter ou créer un compte et devenir membre du Cercle ESSNC.</p>
 
               <form className="user__card" onSubmit={submit} noValidate>
                 <label className="user__field">
@@ -149,7 +149,7 @@ export function UserPanel({ open, onClose, pos }: Props) {
               </div>
 
               <Link href="/connexion?mode=inscription" onClick={onClose} className="user__member">
-                <strong>Rejoignez le Cercle Néoli</strong>
+                <strong>Rejoignez le Cercle ESSNC</strong>
                 <span>Entrez dans le cercle privilégié des membres pour vivre une expérience unique : avantages, échantillons et invitations exclusives.</span>
               </Link>
             </div>

@@ -104,7 +104,7 @@ export const MENU: { items: MenuItem[]; account: { title: string; text: string }
     { id: "engagements", label: "Nos Engagements", href: "/engagements" },
   ],
   account: {
-    title: "Cercle Néoli",
+    title: "Cercle ESSNC",
     text: "Entrez dans le cercle privilégié des membres : découvrez sans attendre avantages et invitations exclusives.",
   },
   footerLinks: [

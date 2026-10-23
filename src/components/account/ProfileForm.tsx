@@ -46,7 +46,7 @@ export function ProfileForm({ email, profile }: { email: string; profile: Profil
         </div>
         <label className="acct__check">
           <input type="checkbox" checked={newsletter} onChange={(e) => setNewsletter(e.target.checked)} />
-          <span>Je souhaite recevoir les actualités, offres et invitations du Cercle Néoli par e-mail.</span>
+          <span>Je souhaite recevoir les actualités, offres et invitations du Cercle ESSNC par e-mail.</span>
         </label>
         {notice && <p className="auth__msg" data-kind={notice.kind} role="status">{notice.text}</p>}
         <button type="submit" className="auth__submit" data-ready="true" disabled={busy} onClick={() => setNotice(null)}>{busy ? "Enregistrement…" : "Enregistrer"}</button>

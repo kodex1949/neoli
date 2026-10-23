@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/account";
 import { getOrdersByEmail } from "@/lib/shopify-admin";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Parrainage — Néoli" };
+export const metadata: Metadata = { title: "Parrainage — ESSNC" };
 
 const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const rand = (n: number) => Array.from({ length: n }, () => ALPHA[Math.floor(Math.random() * ALPHA.length)]).join("");
@@ -29,7 +29,7 @@ export default async function ReferralPage() {
   return (
     <>
       <header className="acct__head">
-        <p className="acct__eyebrow">Cercle Néoli</p>
+        <p className="acct__eyebrow">Cercle ESSNC</p>
         <h1 className="acct__title">Parrainage</h1>
         <p className="acct__lead">Partagez votre code personnel : vous gagnez {SPONSOR_BONUS} points dès la première commande d'un ami, et il reçoit {FRIEND_BONUS} points de bienvenue.</p>
       </header>
@@ -47,7 +47,7 @@ export default async function ReferralPage() {
         <div className="acct__card"><h2>Amis parrainés</h2><p className="ref__n">{R.joined}</p><p>{R.friends} ont commandé · {R.pending} en attente · {R.friends * SPONSOR_BONUS} points gagnés</p>{R.welcomePending && <p>Vos {FRIEND_BONUS} points de bienvenue arriveront après votre première commande.</p>}</div>
         <div className="acct__card">
           <h2>Comment ça marche</h2>
-          <p>1. Envoyez votre lien ou votre code.<br />2. Votre ami crée son compte Néoli.<br />3. Après sa première commande payée, vous gagnez {SPONSOR_BONUS} points, lui {FRIEND_BONUS}.</p>
+          <p>1. Envoyez votre lien ou votre code.<br />2. Votre ami crée son compte ESSNC.<br />3. Après sa première commande payée, vous gagnez {SPONSOR_BONUS} points, lui {FRIEND_BONUS}.</p>
         </div>
       </div>
     </>

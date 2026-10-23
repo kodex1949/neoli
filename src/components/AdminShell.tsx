@@ -48,7 +48,7 @@ export function AdminShell({ email, badges, children }: { email: string; badges:
     <div className="admx" data-open={open}>
       <aside className="admx__side">
         <div className="admx__brand">
-          <Link href="/admin" onClick={() => setOpen(false)}><span>NÉOLI</span><em>Administration</em></Link>
+          <Link href="/admin" onClick={() => setOpen(false)}><span>ESSNC</span><em>Administration</em></Link>
           <button type="button" className="admx__burger" aria-label="Menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
             <svg viewBox="0 0 24 24" aria-hidden="true">{open ? <path d="M6.5 17.5 17.5 6.5M6.5 6.5l11 11" /> : <path d="M4 8h16M4 16h16" />}</svg>
           </button>

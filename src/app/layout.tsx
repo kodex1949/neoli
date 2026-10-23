@@ -14,7 +14,7 @@ import { FavoritesProvider } from "@/lib/favorites";
 import { getMenuMedia } from "@/lib/menu-media";
 
 export const metadata: Metadata = {
-  title: "Néoli — Beauté, parfums & soins",
+  title: "ESSNC — Beauté, parfums & soins",
   description: "Boutique headless Shopify + Supabase.",
 };
 

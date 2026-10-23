@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/account";
 import { getProduct, type Product } from "@/lib/shopify";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Mes favoris — Néoli" };
+export const metadata: Metadata = { title: "Mes favoris — ESSNC" };
 
 export default async function FavoritesPage() {
   await requireUser("/compte/favoris");

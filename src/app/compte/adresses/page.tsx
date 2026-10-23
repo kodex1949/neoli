@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AddressBook } from "@/components/account/AddressBook";
 import { requireUser } from "@/lib/account";
 
-export const metadata: Metadata = { title: "Mes adresses — Néoli" };
+export const metadata: Metadata = { title: "Mes adresses — ESSNC" };
 
 export default async function AddressesPage() {
   const { profile } = await requireUser("/compte/adresses");

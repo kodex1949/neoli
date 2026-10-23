@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ProfileForm } from "@/components/account/ProfileForm";
 import { requireUser } from "@/lib/account";
 
-export const metadata: Metadata = { title: "Mes informations — Néoli" };
+export const metadata: Metadata = { title: "Mes informations — ESSNC" };
 
 export default async function InfoPage() {
   const { user, profile } = await requireUser("/compte/informations");

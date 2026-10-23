@@ -5,7 +5,7 @@ import { AdminHead, AdminStats } from "@/components/AdminHead";
 import { getProduct, getProducts, type Product } from "@/lib/shopify";
 import { decideReview, deleteReview } from "./actions";
 
-export const metadata: Metadata = { title: "Modération des avis — Néoli", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Modération des avis — ESSNC", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 const when = (d: string) => new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(d));

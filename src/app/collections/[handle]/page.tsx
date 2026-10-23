@@ -11,7 +11,7 @@ type Props = { params: Promise<{ handle: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params;
   const meta = collectionMeta(handle);
-  return { title: meta ? `${meta.title} — Néoli` : "Collection — Néoli" };
+  return { title: meta ? `${meta.title} — ESSNC` : "Collection — ESSNC" };
 }
 
 export default async function CollectionPage({ params }: Props) {

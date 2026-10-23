@@ -9,7 +9,7 @@ export function ReferralShare({ code }: { code: string }) {
     try { await navigator.clipboard.writeText(what === "code" ? code : link()); setCopied(what); setTimeout(() => setCopied(""), 2000); } catch {}
   };
   const share = async () => {
-    const data = { title: "Néoli", text: `Rejoignez le Cercle Néoli avec mon code ${code}`, url: link() };
+    const data = { title: "ESSNC", text: `Rejoignez le Cercle ESSNC avec mon code ${code}`, url: link() };
     if (navigator.share) { try { await navigator.share(data); return; } catch { return; } }
     copy("link");
   };

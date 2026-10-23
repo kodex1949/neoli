@@ -68,6 +68,7 @@ const NODE_FIELDS = /* GraphQL */ `
   tags
   productType
   featuredImage { url altText width height }
+  gallery: images(first: 3) { nodes { url altText width height } }
   firstMedia: media(first: 1) { nodes { ${MEDIA_FIELDS} } }
   priceRange { minVariantPrice { amount currencyCode } }
   variants(first: 6) { nodes { id title price { amount currencyCode } weight weightUnit } }
@@ -102,6 +103,7 @@ type Node = {
   priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
   variants: { nodes: { id: string; title: string; price: { amount: string; currencyCode: string }; weight?: number | null; weightUnit?: string | null }[] };
   images?: { nodes: { url: string; altText: string | null; width: number; height: number }[] };
+  gallery?: { nodes: { url: string; altText: string | null; width: number; height: number }[] };
   firstMedia?: { nodes: MediaNode[] };
   media?: { nodes: MediaNode[] };
 };
@@ -157,7 +159,7 @@ const mapNode = (p: Node): Product => ({
   badges: p.tags.filter((t) => ["Nouveauté", "Exclusivité", "Service d'essai"].includes(t)),
   intensity: Number(p.tags.find((t) => /^intensite-[1-5]$/.test(t))?.slice(-1)) || undefined,
   description: p.description || undefined,
-  images: p.images?.nodes.map((i) => ({ url: i.url, alt: i.altText ?? p.title, width: i.width, height: i.height })),
+  images: (p.images ?? p.gallery)?.nodes.map((i) => ({ url: i.url, alt: i.altText ?? p.title, width: i.width, height: i.height })),
   media: p.media?.nodes.map((m) => mapMedia(m, p.title)).filter((m): m is MediaItem => !!m),
   featuredVideo: (() => { const fm = p.firstMedia?.nodes[0]; const f = fm ? mapMedia(fm, p.title) : null; return f?.type === "video" ? f : undefined; })(),
   variants: p.variants.nodes.length > 1 ? p.variants.nodes.map((v) => ({ label: v.title, id: v.id, price: money(v.price.amount, v.price.currencyCode), measure: weightOf(v) })) : undefined,

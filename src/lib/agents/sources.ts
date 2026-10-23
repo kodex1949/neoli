@@ -1,12 +1,18 @@
 // Collecte des données (lecture seule). Chaque source vérifie d'abord la permission de l'agent.
 import { adminConfigured, adminGraphQL } from "../shopify-admin";
-import { getProduct, getProducts } from "../shopify";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getCollection, getProduct, getProducts } from "../shopify";
+import { HOME_COLLECTIONS } from "../collections";
 import { clean, ensure } from "./guard";
 import type { AgentDef, Mode } from "./types";
 import type { CatalogItem } from "./analyzers/product";
 import type { OrderLite } from "./analyzers/analytics";
 import type { Check } from "./analyzers/technical";
 import type { PageProbe } from "./analyzers/seo";
+import type { StockItem } from "./analyzers/inventory";
+import type { OrderStatus } from "./analyzers/orders";
+import type { ReviewLite } from "./analyzers/support";
+import type { CollectionHealth } from "./analyzers/marketing";
 
 export type Ctx = { def: AgentDef; mode: Mode; origin: string; used: Set<string> };
 
@@ -43,6 +49,46 @@ export async function fetchOrders(ctx: Ctx): Promise<{ orders: OrderLite[]; deni
       lines: n.lineItems.nodes.map((l) => ({ title: clean(l.title, 120), quantity: l.quantity })),
     })),
   };
+}
+
+type StockData = { products: { nodes: { handle: string; title: string; status: string; tracksInventory: boolean; totalInventory: number | null }[] } };
+
+/** Stocks par produit (API Admin, lecture seule). */
+export async function fetchStock(ctx: Ctx): Promise<{ items: StockItem[]; denied: boolean }> {
+  ensure(ctx.def, ctx.mode, "shopify.admin.inventory.read"); ctx.used.add("shopify.admin.inventory");
+  const r = await adminGraphQL<StockData>(`query { products(first: 100) { nodes { handle title status tracksInventory totalInventory } } }`);
+  const denied = (r.errors ?? []).some((e) => e.extensions?.code === "ACCESS_DENIED");
+  if (!r.data && !denied) throw new Error(clean(r.errors?.[0]?.message ?? "pas de données"));
+  return { denied, items: (r.data?.products.nodes ?? []).map((n) => ({ handle: n.handle, title: clean(n.title, 120), status: n.status, tracked: n.tracksInventory, quantity: n.totalInventory })) };
+}
+
+type OrderStatusData = { orders: { nodes: { name: string; createdAt: string; displayFinancialStatus: string | null; displayFulfillmentStatus: string | null; cancelledAt: string | null }[] } };
+
+/** Statuts de paiement et d'expédition : ni nom, ni e-mail, ni adresse. */
+export async function fetchOrderStatuses(ctx: Ctx): Promise<{ orders: OrderStatus[]; denied: boolean }> {
+  ensure(ctx.def, ctx.mode, "shopify.admin.orders.read"); ctx.used.add("shopify.admin.orders");
+  const r = await adminGraphQL<OrderStatusData>(`query { orders(first: 100, sortKey: CREATED_AT, reverse: true) { nodes { name createdAt displayFinancialStatus displayFulfillmentStatus cancelledAt } } }`);
+  const denied = (r.errors ?? []).some((e) => e.extensions?.code === "ACCESS_DENIED");
+  if (!r.data && !denied) throw new Error(clean(r.errors?.[0]?.message ?? "pas de données"));
+  return { denied, orders: (r.data?.orders.nodes ?? []).map((n) => ({ name: clean(n.name, 20), createdAt: n.createdAt, payment: n.displayFinancialStatus ?? "", fulfillment: n.displayFulfillmentStatus ?? "", cancelled: !!n.cancelledAt })) };
+}
+
+/** Avis clients (statut, note, date) : le texte et le nom des auteurs ne sont pas lus. */
+export async function fetchReviews(ctx: Ctx, db: SupabaseClient): Promise<ReviewLite[]> {
+  ensure(ctx.def, ctx.mode, "supabase.read"); ctx.used.add("supabase.reviews");
+  const { data, error } = await db.from("reviews").select("id,rating,status,created_at,product_handle").order("created_at", { ascending: false }).limit(200);
+  if (error) throw new Error(clean(error.message));
+  return (data ?? []) as ReviewLite[];
+}
+
+/** Collections mises en avant sur le site : existent-elles et contiennent-elles des produits ? */
+export async function fetchCollectionsHealth(ctx: Ctx): Promise<CollectionHealth[]> {
+  ensure(ctx.def, ctx.mode, "shopify.storefront.read"); ctx.used.add("shopify.storefront");
+  const handles = [...new Set(["parfums", "best-sellers", ...HOME_COLLECTIONS.map((c) => c.href.match(/^\/collections\/([^/?#]+)/)?.[1]).filter((h): h is string => !!h)])];
+  return Promise.all(handles.map(async (handle) => {
+    const c = await getCollection(handle).catch(() => null);
+    return { handle, exists: !!c, count: c?.products.length ?? 0 };
+  }));
 }
 
 export async function probePage(ctx: Ctx, path: string, withHtml = true): Promise<PageProbe & { ms: number }> {

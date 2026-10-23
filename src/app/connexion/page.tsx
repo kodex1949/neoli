@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/AuthForm";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Connexion — Néoli" };
+export const metadata: Metadata = { title: "Connexion — ESSNC" };
 export const dynamic = "force-dynamic";
 
 const safe = (n?: string) => (n && n.startsWith("/") && !n.startsWith("//") ? n : "/compte");

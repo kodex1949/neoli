@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SecurityPanel } from "@/components/account/SecurityPanel";
 import { requireUser } from "@/lib/account";
 
-export const metadata: Metadata = { title: "Connexion et sécurité — Néoli" };
+export const metadata: Metadata = { title: "Connexion et sécurité — ESSNC" };
 
 export default async function SecurityPage() {
   const { user } = await requireUser("/compte/securite");

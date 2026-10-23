@@ -10,7 +10,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const page = LEGAL[slug];
-  return { title: page ? `${page.title} — Néoli` : "Néoli" };
+  return { title: page ? `${page.title} — ESSNC` : "ESSNC" };
 }
 
 export default async function InfoPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -44,7 +44,7 @@ export default async function InfoPage({ params }: { params: Promise<{ slug: str
           <aside className="info__contact">
             <h3>Une question ?</h3>
             <p>Notre équipe vous répond sous 48 h ouvrées.</p>
-            <a href="mailto:contact@neoli.example">Nous écrire</a>
+            <a href="mailto:contact@essnc.example">Nous écrire</a>
           </aside>
         </div>
       </div>
