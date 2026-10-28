@@ -17,6 +17,7 @@ type Props = {
     video?: string; // ex. "/videos/iconiques.mp4" (prioritaire sur l'image)
     poster?: string;
   };
+  centered?: boolean; // sans visuel : titre centré au-dessus du carrousel (au lieu d'un bloc de texte dans la rangée)
   children: ReactNode; // une carte produit par enfant
 };
 
@@ -38,7 +39,7 @@ const arrow = (flip?: boolean) => (
  * (flèches, glisser à la souris, trackpad, doigt), il glisse vers la gauche avec eux, et son contenu
  * bouge un peu moins vite (parallaxe) pour donner de la profondeur.
  */
-export function IconicsShowcase({ eyebrow, title, text, href, introAt = 0, media, children }: Props) {
+export function IconicsShowcase({ eyebrow, title, text, href, introAt = 0, media, centered = false, children }: Props) {
   const root = useRef<HTMLElement>(null);
   const [seen, setSeen] = useState(false); // apparition quand la section entre à l'écran
   const track = useRef<HTMLDivElement>(null);
@@ -165,11 +166,12 @@ export function IconicsShowcase({ eyebrow, title, text, href, introAt = 0, media
   };
 
   return (
-    <section ref={root} className={`showcase${media ? "" : " showcase--plain"}`} data-in={seen} aria-roledescription="carrousel" aria-label={title}>
-      {media && (
+    <section ref={root} className={`showcase${media || centered ? "" : " showcase--plain"}`} data-in={seen} aria-roledescription="carrousel" aria-label={title}>
+      {(media || centered) && (
         <div className="section__head">
           <span className="eyebrow">{eyebrow}</span>
           <h2 className="display">{title}</h2>
+          {centered && text && <p className="showcase__lede">{text}</p>}
         </div>
       )}
 
@@ -212,7 +214,7 @@ export function IconicsShowcase({ eyebrow, title, text, href, introAt = 0, media
             <div key={`p-${i}`} className="showcase__item" style={{ "--i": i } as CSSProperties}>{child}</div>
           ));
           // Sans visuel : le bloc de texte s'intercale au milieu de la rangée (après `introAt` produits)
-          if (!media) {
+          if (!media && !centered) {
             const at = Math.min(introAt, items.length);
             items.splice(at, 0,
               <div key="intro" className="showcase__item showcase__intro" style={{ "--i": at } as CSSProperties}>

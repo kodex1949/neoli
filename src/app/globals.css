@@ -2994,3 +2994,19 @@ a.footer__service:active { transform: scale(0.98); }
 .icd--plain .icd__cap h3 { max-width: 16ch; font-weight: 350; font-size: clamp(28px, 2.6vw, 40px); line-height: 1.1; letter-spacing: -.02em; }
 .icd--plain .icd__cap a { font-size: 14px; font-weight: 500; }
 .icd__ctl { left: 12px; bottom: 12px; }
+
+/* Cartes alignées : mêmes hauteurs, hauts alignés sur le visuel, titre sur 2 lignes réservées, pied de carte en bas */
+.showcase__track { align-items: stretch; }
+.showcase__media { align-self: flex-start; }
+.showcase__item { display: flex; }
+.showcase__item .card { width: 100%; grid-template-rows: auto 1fr; align-content: stretch; }
+.showcase__item .card__meta { display: flex; flex-direction: column; gap: 6px; align-content: normal; }
+.showcase__item .card__row { align-items: flex-start; min-height: 34px; }
+.showcase__item .card__foot { margin-top: auto; }
+.showcase__item .card__foot { align-items: flex-start; min-height: 44px; }
+/* Correctif : sur grand écran les cartes ne doivent pas s'étirer à la hauteur du visuel ; les hauteurs réservées suffisent à les aligner */
+.showcase__track { align-items: flex-start; }
+.showcase__item { align-self: flex-start; }
+.showcase__item .card { grid-template-rows: none; align-content: start; }
+.showcase__item .card__foot { margin-top: 0; }
+.showcase__track { justify-content: safe center; }

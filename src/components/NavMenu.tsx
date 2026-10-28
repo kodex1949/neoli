@@ -114,7 +114,7 @@ export function NavMenu({ open, onClose, media = {} }: Props) {
 
                 {sub.iconics && (
                   <div className="nav__section nav__anim" style={idx(2)}>
-                    <p className="nav__label">Les iconiques</p>
+                    <p className="nav__label">Nouveautés & coups de cœur</p>
                     <div className="nav__iconics">
                       {sub.iconics.map((p, k) => {
                         const m = media[slotId(view ?? "", "iconic", k)];

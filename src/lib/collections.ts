@@ -2,9 +2,9 @@ import { MENU } from "./menu";
 
 // Nom et texte d'introduction des collections. Le nom vient du menu ; avec Shopify, c'est le titre de la collection qui prime.
 const TEXTS: Record<string, { eyebrow: string; text: string }> = {
-  nouveautes: { eyebrow: "Collection", text: "Les dernières créations d'ESSNC : parfums, maquillage et soins à découvrir en avant-première." },
-  "best-sellers": { eyebrow: "Iconiques", text: "Les produits préférés de nos clients, ceux que l'on offre et que l'on rachète." },
-  exclusifs: { eyebrow: "Exclusivités", text: "Des créations rares, disponibles uniquement chez ESSNC et en ligne." },
+  nouveautes: { eyebrow: "Collection", text: "Les dernières créations de Néoli : parfums, maquillage et soins à découvrir en avant-première." },
+  "best-sellers": { eyebrow: "Coups de cœur", text: "Les produits préférés de nos clients, ceux que l'on offre et que l'on rachète." },
+  exclusifs: { eyebrow: "Exclusivités", text: "Des créations rares, disponibles uniquement chez Néoli et en ligne." },
   parfums: { eyebrow: "Parfumerie", text: "Eaux de parfum, extraits et eaux de toilette : des sillages pensés comme des signatures." },
   "haute-parfumerie": { eyebrow: "La Collection Privée", text: "Des matières précieuses et des accords audacieux, composés en petites séries." },
   maquillage: { eyebrow: "Maquillage", text: "Des textures confortables et des couleurs intenses pour sublimer chaque regard." },
@@ -22,7 +22,7 @@ export function collectionMeta(handle: string): { title: string; eyebrow: string
   }
   if (!label) return null;
   const t = TEXTS[handle];
-  return { title: label, eyebrow: t?.eyebrow ?? "Collection", text: t?.text ?? "Une sélection d'ESSNC, à découvrir." };
+  return { title: label, eyebrow: t?.eyebrow ?? "Collection", text: t?.text ?? "Une sélection de Néoli, à découvrir." };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -58,9 +58,9 @@ export const COLLECTION_CONTENT: Record<string, { blocks?: CollectionBlock[] }> 
         right: true,
         duration: 6,
         slides: [
-          { image: "/images/tuile-droite.jpg", eyebrow: "Parfum", title: "L’esprit d'ESSNC", text: "Une signature florale et solaire.", cta: { label: "Découvrir", href: "/collections/parfums" } },
+          { image: "/images/tuile-droite.jpg", eyebrow: "Parfum", title: "L’esprit de Néoli", text: "Une signature florale et solaire.", cta: { label: "Découvrir", href: "/collections/parfums" } },
           { image: "/images/tuile-gauche.jpg", eyebrow: "Nouveauté", title: "Le jasmin, nouvel esprit", cta: { label: "Voir la collection", href: "/collections/nouveautes" } },
-          { video: "/videos/hero.mp4", eyebrow: "Coulisses", title: "Un geste, une matière", text: "Dans l'atelier d'ESSNC.", cta: { label: "Explorer", href: "/collections/parfums" } },
+          { video: "/videos/hero.mp4", eyebrow: "Coulisses", title: "Un geste, une matière", text: "Dans l'atelier de Néoli.", cta: { label: "Explorer", href: "/collections/parfums" } },
         ],
       },
     ],
@@ -92,6 +92,6 @@ export const HOME_COLLECTIONS: HomeCollection[] = [
   { id: "haute", label: "Haute parfumerie", eyebrow: "La Collection Privée", title: "Haute parfumerie", text: "Des accords rares et des matières précieuses, composés en petites séries.", href: "/collections/haute-parfumerie", image: "/images/tuile-gauche.jpg", position: "50% 40%", tint: "#3a2a2c" },
   { id: "maquillage", label: "Maquillage", eyebrow: "Nouveauté", title: "Couleur & confort", text: "Des rouges à lèvres mats sans transfert, des teintes intenses qui tiennent 24 h.", href: "/collections/maquillage", image: "/images/tuile-droite.jpg", position: "20% 50%", tint: "#8c4a46" },
   { id: "soin", label: "Soins", eyebrow: "Rituels", title: "Une peau lumineuse", text: "Sérums, crèmes et huiles pour une peau nourrie, apaisée et repulpée.", href: "/collections/soin", image: "/images/tuile-droite.jpg", position: "85% 60%", tint: "#b79c82" },
-  { id: "bougies", label: "Bougies & Maison", eyebrow: "Maison", title: "L'atmosphère d'ESSNC", text: "Des bougies parfumées pour installer une présence chaleureuse chez soi.", href: "/collections/bougies", image: "/images/tuile-gauche.jpg", position: "90% 70%", tint: "#5e4a36" },
+  { id: "bougies", label: "Bougies & Maison", eyebrow: "Maison", title: "L'atmosphère de Néoli", text: "Des bougies parfumées pour installer une présence chaleureuse chez soi.", href: "/collections/bougies", image: "/images/tuile-gauche.jpg", position: "90% 70%", tint: "#5e4a36" },
   { id: "cadeaux", label: "Cadeaux", eyebrow: "À offrir", title: "Offrir et personnaliser", text: "Coffrets, gravure et emballage couture : des idées à offrir, joliment signées.", href: "/collections/cadeaux", image: "/images/tuile-droite.jpg", position: "55% 20%", tint: "#2f3b3a" },
 ];

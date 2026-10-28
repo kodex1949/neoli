@@ -26,7 +26,6 @@ export default async function Home() {
     };
   };
   // Essentiels tendance : les produits de la collection dont le lien est saisi dans l'admin (/collections/nom), sinon le catalogue.
-  const ic = media["home:iconics"];
   const ess = media["home:essentials"];
   const essv = media["home:essentials:visual"];
   const essHref = ess?.href || "/collections/best-sellers";
@@ -64,14 +63,8 @@ export default async function Home() {
         ]}
       />
 
-      {/* Les iconiques : version d'origine (visuel à gauche qui défile avec le carrousel de produits). Visuel modifiable dans /admin/menu. */}
-      <IconicsShowcase eyebrow="Sélection" title="Les iconiques" media={{
-        eyebrow: ic?.eyebrow || "Nouvelle collection",
-        title: ic?.title || "Une eau de parfum solaire",
-        href: ic?.href || "/collections/parfums",
-        image: ic?.url && ic.kind === "image" ? ic.url : ic?.url ? undefined : "/images/tuile-droite.jpg",
-        video: ic?.url && ic.kind === "video" ? ic.url : undefined,
-      }}>
+      {/* Nouveautés & coups de cœur (ex-« Les iconiques ») : carrousel de produits, sans visuel. */}
+      <IconicsShowcase eyebrow="Sélection" title="Nouveautés & coups de cœur" centered>
         {products.map((p) => <ProductCard key={p.handle} product={p} />)}
       </IconicsShowcase>
 
