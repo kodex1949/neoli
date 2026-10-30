@@ -3425,3 +3425,8 @@ a.footer__service:active { transform: scale(0.98); }
 .pdpb__wallet:disabled { cursor: default; opacity: .7; }
 .pdpb__note { margin-top: 14px; }
 @media (prefers-reduced-motion: reduce) { .pdpb__unit { animation: none; } }
+
+/* Mobile : carrousel sans visuel (Nouveautés & coups de cœur) : le pager passe sous les cartes, au lieu de les recouvrir */
+@media (max-width: 768px) {
+  .showcase--solo .showcase__stepper { position: static; translate: none; margin: 32px auto 0; width: fit-content; }
+}

@@ -166,7 +166,7 @@ export function IconicsShowcase({ eyebrow, title, text, href, introAt = 0, media
   };
 
   return (
-    <section ref={root} className={`showcase${media || centered ? "" : " showcase--plain"}`} data-in={seen} aria-roledescription="carrousel" aria-label={title}>
+    <section ref={root} className={`showcase${media ? "" : centered ? " showcase--solo" : " showcase--plain"}`} data-in={seen} aria-roledescription="carrousel" aria-label={title}>
       {(media || centered) && (
         <div className="section__head">
           <span className="eyebrow">{eyebrow}</span>
