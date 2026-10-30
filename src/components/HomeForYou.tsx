@@ -58,22 +58,17 @@ export function HomeForYou() {
   return (
     <section className="foru" aria-label="Pour vous">
       <header className="foru__head">
-        <div className="foru__intro">
-          <p className="foru__eyebrow"><span aria-hidden="true" />Pour vous</p>
-          <h2 className="foru__title">Sélectionnés selon votre profil olfactif</h2>
-          {profile.length > 0 && (
+        <p className="foru__eyebrow"><span aria-hidden="true" />Pour vous<span aria-hidden="true" /></p>
+        <h2 className="foru__title">Sélectionnés selon votre profil olfactif</h2>
+        {profile.length > 0 && (
+          <div className="foru__prof">
+            <span>Votre profil</span>
             <ul className="foru__profile" aria-label="Votre profil olfactif">
               {profile.map((x) => <li key={x}>{x}</li>)}
             </ul>
-          )}
-        </div>
-        <div className="foru__tools">
-          <Link href="/compte/profil-olfactif" className="foru__link">Modifier mon profil</Link>
-          <div className="foru__arrows">
-            <button type="button" onClick={() => slide(-1)} disabled={edge.start} aria-label="Précédent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6" /></svg></button>
-            <button type="button" onClick={() => slide(1)} disabled={edge.end} aria-label="Suivant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6" /></svg></button>
           </div>
-        </div>
+        )}
+        <Link href="/compte/profil-olfactif" className="foru__link">Modifier mon profil</Link>
       </header>
       <ul className="stories" ref={track}>
         {picks.map(({ product, why }, i) => (
@@ -90,6 +85,7 @@ export function HomeForYou() {
                 {why.length > 0 && <span className="stories__tags">{why.slice(0, 2).map((w) => <em key={w}>{w}</em>)}</span>}
                 {product.featuredVideo && <span className="stories__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M8 5.5v13l11-6.5z" /></svg></span>}
                 <span className="stories__go" aria-hidden="true">Voir la story</span>
+                <span className="stories__no" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
               </span>
               <span className="stories__meta">
                 <strong>{product.title}</strong>
@@ -99,6 +95,10 @@ export function HomeForYou() {
           </li>
         ))}
       </ul>
+      <div className="foru__arrows" data-hide={edge.start && edge.end}>
+        <button type="button" onClick={() => slide(-1)} disabled={edge.start} aria-label="Précédent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6" /></svg></button>
+        <button type="button" onClick={() => slide(1)} disabled={edge.end} aria-label="Suivant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6" /></svg></button>
+      </div>
       {open !== null && <StoryViewer picks={picks} start={open} onSeen={markSeen} onClose={() => setOpen(null)} />}
     </section>
   );

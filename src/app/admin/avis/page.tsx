@@ -14,7 +14,7 @@ const LABEL = { pending: "En attente", approved: "Publié", rejected: "Refusé" 
 export default async function ReviewsAdminPage() {
   const db = await createClient();
   const { data: u } = await db.auth.getUser();
-  if (!u.user) redirect("/connexion?next=/admin/avis");
+  if (!u.user) redirect("/admin/login?next=/admin/avis");
   const { data: isAdmin } = await db.rpc("is_agent_admin");
   if (isAdmin !== true) {
     return (

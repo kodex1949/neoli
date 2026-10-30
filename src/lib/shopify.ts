@@ -24,6 +24,7 @@ export type Product = {
   format?: string; // ex. « Spray 50 ml »
   category?: string; // Parfums, Maquillage, Soins… (productType Shopify) : sert au filtre des collections
   engraving?: boolean; // gravure proposée (étiquette « gravure » dans Shopify)
+  notes?: { top?: string; heart?: string; base?: string }; // pyramide olfactive, depuis les étiquettes tete:/coeur:/fond:
   description?: string; // texte complet (fiche produit)
   images?: { url: string; alt: string; width: number; height: number }[]; // galerie (fiche produit)
   media?: MediaItem[]; // galerie complète : images + vidéos, dans l'ordre Shopify (fiche produit)
@@ -143,6 +144,14 @@ const weightOf = (v?: { weight?: number | null; weightUnit?: string | null }): s
 };
 const sizeText = (title: string) => (/default title/i.test(title) ? undefined : title);
 
+/** Courte phrase pour sous le nom : coupée à un mot entier, sans virgule ni point final orphelin. */
+function shortLine(s: string, max = 90) {
+  const one = s.trim();
+  if (one.length <= max) return one;
+  const cut = one.slice(0, max).replace(/\s+\S*$/, "").replace(/[\s,;:–-]+$/, "");
+  return `${cut}…`;
+}
+
 const mapNode = (p: Node): Product => ({
   id: p.id,
   handle: p.handle,
@@ -155,9 +164,10 @@ const mapNode = (p: Node): Product => ({
   category: p.productType || undefined,
   engraving: p.tags.includes("gravure") || undefined,
   // Dans Shopify : description = texte court ; étiquettes « Nouveauté », « Exclusivité », « Service d'essai », « intensite-3 », « format:Spray 50 ml »
-  tagline: p.description ? p.description.split("\n")[0].slice(0, 90) : undefined,
+  tagline: p.description ? shortLine(p.description.split("\n")[0]) : undefined,
   badges: p.tags.filter((t) => ["Nouveauté", "Exclusivité", "Service d'essai"].includes(t)),
   intensity: Number(p.tags.find((t) => /^intensite-[1-5]$/.test(t))?.slice(-1)) || undefined,
+  notes: (() => { const t = (k: string) => p.tags.find((x) => x.toLowerCase().startsWith(k + ":"))?.slice(k.length + 1).trim() || undefined; const n = { top: t("tete"), heart: t("coeur"), base: t("fond") }; return n.top || n.heart || n.base ? n : undefined; })(),
   description: p.description || undefined,
   images: (p.images ?? p.gallery)?.nodes.map((i) => ({ url: i.url, alt: i.altText ?? p.title, width: i.width, height: i.height })),
   media: p.media?.nodes.map((m) => mapMedia(m, p.title)).filter((m): m is MediaItem => !!m),

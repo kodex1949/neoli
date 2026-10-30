@@ -15,7 +15,7 @@ const when = (d?: string | null) => (d ? new Intl.DateTimeFormat("fr-FR", { day:
 export default async function AgentsAdminPage() {
   const db = await createClient();
   const { data: u } = await db.auth.getUser();
-  if (!u.user) redirect("/connexion?next=/admin/agents");
+  if (!u.user) redirect("/admin/login?next=/admin/agents");
   const { data: isAdmin } = await db.rpc("is_agent_admin");
   if (isAdmin !== true) {
     return (

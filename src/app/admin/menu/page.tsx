@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function MenuAdminPage() {
   const db = await createClient();
   const { data: u } = await db.auth.getUser();
-  if (!u.user) redirect("/connexion?next=/admin/menu");
+  if (!u.user) redirect("/admin/login?next=/admin/menu");
   const { data: isAdmin } = await db.rpc("is_agent_admin");
   if (isAdmin !== true) {
     return (

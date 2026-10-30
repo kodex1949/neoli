@@ -8,12 +8,15 @@ import { HomeForYou } from "@/components/HomeForYou";
 import { IconicsShowcase } from "@/components/IconicsShowcase";
 import { ProductCard } from "@/components/ProductCard";
 import { getMenuMedia } from "@/lib/menu-media";
+import { getCreations } from "@/lib/creations";
+import { CreationsSection } from "@/components/CreationsSection";
 
 export const revalidate = 60;
 
 export default async function Home() {
   const products = await getProducts(8);
   const media = await getMenuMedia();
+  const creations = await getCreations();
   const hero = media["home:hero"];
   const tile = (i: 0 | 1, fallback: { caption: string; href: string; image: string }) => {
     const m = media[`home:tile:${i}`];
@@ -79,6 +82,9 @@ export default async function Home() {
         image: essv?.url && essv.kind === "image" ? essv.url : essv?.url ? undefined : "/images/tuile-gauche.jpg",
         video: essv?.url && essv.kind === "video" ? essv.url : undefined,
       }} />
+
+      {/* Créations : texte à gauche, visuel à droite. Gérées dans /admin/creations. */}
+      <CreationsSection items={creations} />
 
       {/* La nouvelle icône couture : panneaux de collections. Visuels et textes : /admin/menu → « Icône couture » (valeurs d'origine dans HOME_COLLECTIONS, src/lib/collections.ts). */}
       <CollectionsShowcase items={panels} eyebrow={sec?.eyebrow || "Parfum"} title={sec?.title || "La nouvelle icône couture"} href={sec?.href || "/collections/parfums"} cta={sec?.cta || "Découvrir"} />

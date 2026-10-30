@@ -27,7 +27,17 @@ export function unitPriceOf(label: string, price: string): string | null {
   const per = (total / m.base) * 1000;
   if (!Number.isFinite(per)) return null;
   const qty = m.kind === "l" ? `${fr(m.base)} ml` : m.base >= 1000 ? `${fr(m.base / 1000)} kg` : `${fr(m.base)} g`;
-  return `${qty} (${eur(per)} € / ${m.kind})`;
+  return `${qty} · ${eur(per)} € / ${m.kind}`;
+}
+
+/** Prix à l'unité en deux morceaux pour l'affichage détaillé : { label: « Prix au litre », value: « 699,00 € », qty: « 100 ml » }. */
+export function unitParts(label: string, price: string): { label: string; value: string; qty: string; unit: "l" | "kg" } | null {
+  const m = measure(label);
+  if (!m || !m.base) return null;
+  const per = (num(price) / m.base) * 1000;
+  if (!Number.isFinite(per)) return null;
+  const qty = m.kind === "l" ? `${fr(m.base)} ml` : m.base >= 1000 ? `${fr(m.base / 1000)} kg` : `${fr(m.base)} g`;
+  return { label: m.kind === "l" ? "Prix au litre" : "Prix au kilo", value: `${eur(per)} €`, qty, unit: m.kind };
 }
 
 /**

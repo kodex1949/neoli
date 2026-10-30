@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-/** Inscription à la newsletter. Pour l'instant l'adresse n'est envoyée nulle part : branchez Shopify (customerCreate) ou votre outil d'e-mailing dans `submit`. */
+/** Inscription à la newsletter : l'adresse est enregistrée dans Supabase (table newsletter_subscribers, via la fonction newsletter_subscribe) et consultable dans /admin/newsletter. */
 export function Newsletter() {
   const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "error" | "done">("idle");
+  const [state, setState] = useState<"idle" | "error" | "busy" | "fail" | "done">("idle");
+  const supabase = useMemo(() => createClient(), []);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (state === "busy") return;
     if (!EMAIL.test(email.trim())) { setState("error"); return; }
-    setState("done");
+    if (!supabase) { setState("fail"); return; }
+    setState("busy");
+    const { error } = await supabase.rpc("newsletter_subscribe", { p_email: email.trim(), p_source: "footer" });
+    setState(error ? (error.code === "22023" ? "error" : "fail") : "done");
   };
 
   return (
@@ -38,9 +44,11 @@ export function Newsletter() {
                 aria-invalid={state === "error"}
               />
             </label>
-            <button type="submit" className="nl__submit">Confirmer</button>
+            <button type="submit" className="nl__submit" disabled={state === "busy"}>{state === "busy" ? "Envoi…" : "Confirmer"}</button>
           </div>
           {state === "error" && <p className="nl__error" role="alert">Saisissez une adresse e-mail valide.</p>}
+          {state === "fail" && <p className="nl__error" role="alert">L'inscription a échoué. Réessayez dans un instant.</p>}
+          <p className="nl__legal">En vous inscrivant, vous acceptez de recevoir nos e-mails. Désinscription possible à tout moment.</p>
         </>
       )}
     </form>
