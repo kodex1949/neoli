@@ -17,7 +17,7 @@ const services: { title: string; text: string; href?: string; icon: React.ReactN
 ];
 
 const perks = [
-  { title: "Avantages e-boutique", text: "Échantillons et miniatures offerts avec vos commandes.", href: "/collections/cadeaux" },
+  { title: "Avantages e-boutique", text: "Échantillons et miniatures offerts avec vos commandes.", href: "/collections/idees-cadeaux" },
   { title: "Exclusivité", text: "Découvrez nos coffrets en édition très limitée.", href: "/collections/exclusifs" },
   { title: "Cercle ESSNC", text: "Gagnez des points à chaque achat et profitez d'avantages réservés aux membres.", href: "/compte/avantages" },
 ];

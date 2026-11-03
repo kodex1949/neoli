@@ -23,5 +23,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|webp|avif)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|api/track|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|webp|avif)$).*)"],
 };

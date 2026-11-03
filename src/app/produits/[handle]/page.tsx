@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ReviewsPanel } from "@/components/ReviewsPanel";
 import { getReviews } from "@/lib/reviews";
-import { ACCORDIONS, FALLBACK_TEXT, PERKS, scentAccordion } from "@/lib/product-content";
+import { ACCORDIONS, FALLBACK_TEXT, PERKS, ingredientsAccordion, scentAccordion } from "@/lib/product-content";
 import { getProduct, getProducts } from "@/lib/shopify";
 
 export const revalidate = 60;
@@ -37,7 +37,7 @@ export default async function ProductPage({ params }: Props) {
       <section className="pdp__about">
         <ReadMore text={product.description ?? FALLBACK_TEXT} />
         <div className="pdp__aside">
-          <Accordion items={[...ACCORDIONS, ...(scentAccordion(product.notes) ? [scentAccordion(product.notes)!] : [])]} />
+          <Accordion items={[ingredientsAccordion(product.ingredients, product.allergens), ...ACCORDIONS, scentAccordion(product.notes)].filter((x): x is NonNullable<typeof x> => !!x)} />
           <ReviewsPanel handle={product.handle} data={reviews} />
           <ul className="pdp__perks">
             {PERKS.map((p) => <li key={p}>{p}</li>)}

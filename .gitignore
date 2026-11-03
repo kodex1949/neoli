@@ -3,3 +3,7 @@ node_modules
 .env*.local
 .env
 next-env.d.ts
+
+# Polices d'essai (licence « usage personnel ») : ne jamais les publier
+atacama-font-family/
+hellix-font-family/

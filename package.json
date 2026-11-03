@@ -13,6 +13,7 @@
     "@fontsource-variable/newsreader": "^5.2.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.58.0",
+    "@vercel/analytics": "^1.6.1",
     "next": "15.5.14",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
@@ -21,6 +22,8 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.4",
     "typescript": "^5.7.0"
   }
 }

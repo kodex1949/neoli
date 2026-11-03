@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { track } from "@/lib/track";
 
 // Panier côté navigateur (localStorage). Le paiement passe ensuite par Shopify (voir /api/checkout).
 export type CartLine = {
@@ -49,6 +50,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [lastAdded, setLastAdded] = useState<Added | null>(null);
+  const linesRef = useRef<CartLine[]>([]);
+  linesRef.current = lines;
   const openPanel = useCallback(() => setPanelOpen(true), []);
   const closePanel = useCallback(() => setPanelOpen(false), []);
 
@@ -76,6 +79,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const add = useCallback((line: NewLine, qty = 1) => {
     setLastAdded({ n: Date.now(), title: line.title, image: line.image, price: line.price });
+    track("add_to_cart", { handle: line.handle, v: Math.round((linesRef.current.reduce((n, l) => n + l.qty * l.unit, 0) + toNumber(line.price) * qty) * 100) / 100 });
     setLines((prev) => {
       const found = prev.find((l) => l.id === line.id);
       if (found) return prev.map((l) => (l.id === line.id ? { ...l, qty: Math.min(99, l.qty + qty) } : l));
@@ -117,6 +121,7 @@ export function useCheckout() {
   const checkout = async () => {
     setBusy(true);
     setError("");
+    track("begin_checkout", { v: Math.round(lines.reduce((n, l) => n + l.qty * l.unit, 0) * 100) / 100 });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

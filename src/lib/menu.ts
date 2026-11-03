@@ -37,13 +37,13 @@ export const MENU: { items: MenuItem[]; account: { title: string; text: string }
             { label: "Les Best-sellers", href: "/collections/best-sellers" },
             { label: "Les Exclusifs", href: "/collections/exclusifs" },
             { label: "Les Coffrets Cadeaux", href: "/collections/coffrets" },
-            { label: "Offrir et Personnaliser", href: "/collections/personnalisation" },
+            { label: "Offrir et Personnaliser", href: "/collections/offrir-et-personnaliser" },
           ],
           [
             { label: "La Haute Parfumerie", href: "/collections/haute-parfumerie" },
-            { label: "Parfums pour Femme", href: "/collections/femme" },
-            { label: "Parfums pour Homme", href: "/collections/homme" },
-            { label: "Parfums Mixtes", href: "/collections/mixtes" },
+            { label: "Parfums pour Femme", href: "/collections/parfums-pour-femme" },
+            { label: "Parfums pour Homme", href: "/collections/parfums-pour-homme" },
+            { label: "Parfums Mixtes", href: "/collections/parfums-mixtes" },
             { label: "Les Miniatures", href: "/collections/miniatures" },
           ],
         ],
@@ -53,14 +53,14 @@ export const MENU: { items: MenuItem[]; account: { title: string; text: string }
     {
       id: "bougies",
       label: "Bougies & Maison",
-      href: "/collections/bougies",
+      href: "/collections/bougies-parfumes",
       submenu: {
         title: "Bougies & Maison",
         groups: [
           [
-            { label: "Les Bougies parfumées", href: "/collections/bougies" },
+            { label: "Les Bougies parfumées", href: "/collections/bougies-parfumes" },
             { label: "Les Diffuseurs", href: "/collections/diffuseurs" },
-            { label: "Les Brumes d'intérieur", href: "/collections/brumes" },
+            { label: "Les Brumes d'intérieur", href: "/collections/brumes-dinterieur" },
             { label: "Les Encens", href: "/collections/encens" },
           ],
         ],
@@ -70,15 +70,15 @@ export const MENU: { items: MenuItem[]; account: { title: string; text: string }
     {
       id: "soin",
       label: "Le Soin & le Corps",
-      href: "/collections/soin",
+      href: "/collections/soins",
       submenu: {
         title: "Le Soin & le Corps",
         groups: [
           [
-            { label: "Les Soins du corps", href: "/collections/corps" },
-            { label: "Les Huiles & Laits", href: "/collections/huiles" },
-            { label: "Les Savons & Bains", href: "/collections/bains" },
-            { label: "Les Soins des mains", href: "/collections/mains" },
+            { label: "Les Soins du corps", href: "/collections/soins-du-corps" },
+            { label: "Les Huiles & Laits", href: "/collections/huiles-et-laits" },
+            { label: "Les Savons & Bains", href: "/collections/savons-et-bains" },
+            { label: "Les Soins des mains", href: "/collections/soins-des-mains" },
           ],
         ],
         cards: cards("Le rituel du soir", "Les essentiels du voyage"),
@@ -87,15 +87,15 @@ export const MENU: { items: MenuItem[]; account: { title: string; text: string }
     {
       id: "cadeaux",
       label: "Les Cadeaux",
-      href: "/collections/cadeaux",
+      href: "/collections/idees-cadeaux",
       submenu: {
         title: "Les Cadeaux",
         groups: [
           [
             { label: "Les Coffrets", href: "/collections/coffrets" },
             { label: "Les Cartes cadeaux", href: "/cartes-cadeaux" },
-            { label: "Personnalisation", href: "/collections/personnalisation" },
-            { label: "Idées cadeaux par budget", href: "/collections/cadeaux" },
+            { label: "Personnalisation", href: "/collections/offrir-et-personnaliser" },
+            { label: "Idées cadeaux par budget", href: "/collections/idees-cadeaux" },
           ],
         ],
         cards: cards("Offrir un parfum", "Les coffrets de fêtes"),

@@ -1,0 +1,125 @@
+/* Khamrah Mira — « Ambre nocturne » : fond espresso, disque de lumière, chapitres épinglés. Complète opulent.css (reveal, barre d'achat, achat, FAQ). */
+.kh {
+  --kh-bg: #170b06; --kh-bg2: #22110a; --kh-line: rgba(239, 204, 146, .22);
+  --kh-txt: #f4e6d2; --kh-dim: rgba(244, 230, 210, .56); --kh-gold: #efcc92;
+}
+.kh .kh-dark { background: var(--kh-bg); color: var(--kh-txt); }
+.kh h1, .kh h2, .kh h3 { font-family: var(--serif); font-weight: 300; letter-spacing: -.02em; margin: 0; }
+
+/* ───────── 1. Héros : un disque de lumière qui s'élargit jusqu'à tout couvrir ───────── */
+.kh-hero { --e: 0; --f: 0; --pp: 0; position: relative; height: 260vh; background: var(--kh-bg); }
+.kh-hero__pin { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); overflow: hidden; isolation: isolate; }
+.kh-hero__disc { position: absolute; inset: 0; z-index: 1; animation: op-open 1.8s var(--ease-io) .15s both; clip-path: circle(calc(var(--o) * 27vmin + var(--e) * 100vmax) at 50% 52%); }
+.kh-hero__disc img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 36%; transform-origin: 60% 40%; scale: min(1, calc(.64 + var(--e) * 2.6)); translate: calc(var(--tx, 0) * 1px) calc(var(--ty, 0) * 1px); }
+.kh-hero__shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(23, 11, 6, .9) 0%, rgba(23, 11, 6, .45) 40%, rgba(23, 11, 6, 0) 70%); opacity: var(--f); }
+.kh-ring { position: absolute; z-index: 2; left: 50%; top: 52%; width: calc(27vmin * 2 + 64px); aspect-ratio: 1; translate: -50% -50%; scale: calc(1 + var(--e) * .6); opacity: calc(var(--o) * (1 - var(--e) * 2.4)); pointer-events: none; animation: op-open 1.8s var(--ease-io) .15s both; }
+.kh-ring svg { width: 100%; height: 100%; overflow: visible; animation: kh-spin 38s linear infinite; }
+.kh-ring text { fill: var(--kh-gold); font-family: var(--font-sans, system-ui), sans-serif; font-size: 10.5px; letter-spacing: .34em; text-transform: uppercase; }
+@keyframes kh-spin { to { rotate: 360deg; } }
+.kh-hero__title { position: absolute; inset: 0; z-index: 3; pointer-events: none; font-size: clamp(70px, 13.4vw, 250px); line-height: .84; color: var(--kh-txt); mix-blend-mode: normal; }
+.kh-hero__l1 { position: absolute; left: 4vw; top: 5%; translate: calc(var(--e) * -16vw) 0; opacity: max(0, calc(1 - var(--e) * 1.4)); font-style: italic; }
+.kh-hero__l2 { position: absolute; right: 4vw; bottom: 6%; translate: calc(var(--e) * 16vw) 0; opacity: max(0, calc(1 - var(--e) * 1.4)); }
+.kh-hero__sub { position: absolute; z-index: 3; left: 50%; bottom: 3.5%; translate: -50% 0; font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--kh-dim); opacity: max(0, calc(1 - var(--e) * 3)); white-space: nowrap; }
+.kh-hero__final { position: absolute; z-index: 4; left: 50%; bottom: clamp(28px, 7vh, 72px); width: min(620px, calc(100% - 2 * var(--pad))); translate: -50% calc((1 - var(--f)) * 36px); text-align: center; color: var(--kh-txt); opacity: var(--f); pointer-events: none; }
+.kh-hero__final p { margin: 0 0 18px; font-family: var(--serif); font-style: italic; font-size: clamp(28px, 3.4vw, 46px); line-height: 1.05; }
+.kh-hero__final .op-btn { pointer-events: auto; }
+.kh-hero__final ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin: 20px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--kh-dim); }
+
+/* ───────── 2. Manifeste : texte centré qui s'allume ───────── */
+.kh-man { padding: clamp(96px, 16vw, 220px) var(--pad); background: var(--kh-bg); color: var(--kh-txt); text-align: center; }
+.kh-man h2 { max-width: 20ch; margin: 0 auto; font-size: clamp(34px, 5.6vw, 92px); line-height: 1.02; }
+.kh-man .op-w { color: rgba(244, 230, 210, .2); transition: color .5s var(--ease); }
+.kh-man .op-w[data-on="1"] { color: var(--kh-txt); }
+.kh-man .op-link { display: inline-block; margin-top: 44px; color: var(--kh-gold); text-decoration-color: rgba(239, 204, 146, .5); }
+
+/* ───────── 3. Bandeau défilant ───────── */
+.kh-marq { overflow: hidden; background: var(--kh-bg2); border-block: 1px solid var(--kh-line); color: var(--kh-gold); }
+.kh-marq__in { display: flex; width: max-content; animation: kh-marq 46s linear infinite; }
+.kh-marq__in span { padding: 22px 34px; font-family: var(--serif); font-style: italic; font-size: clamp(26px, 3vw, 44px); white-space: nowrap; }
+.kh-marq__in span::after { content: "✦"; margin-left: 68px; font-style: normal; font-size: .5em; vertical-align: .25em; opacity: .7; }
+@keyframes kh-marq { to { translate: -50% 0; } }
+
+/* ───────── 4. Chapitres épinglés : jour, soir, fêtes ───────── */
+.kh-chap { --pp: 0; position: relative; height: 330vh; background: var(--kh-bg); color: var(--kh-txt); }
+.kh-chap__pin { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 6vw, 110px); padding: 0 var(--pad); overflow: hidden; }
+.kh-chap__txt { position: relative; height: min(70vh, 560px); }
+.kh-chap__no { position: absolute; left: 0; top: 0; font-size: 13px; letter-spacing: .3em; color: var(--kh-gold); }
+.kh-chap__no b { font-weight: 400; color: var(--kh-dim); }
+.kh-ch { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; opacity: 0; translate: 0 26px; transition: opacity .7s var(--ease), translate .9s var(--ease); pointer-events: none; }
+.kh-ch h3 { font-size: clamp(64px, 9vw, 150px); line-height: .9; font-style: italic; color: var(--kh-gold); }
+.kh-ch p { max-width: 30ch; margin: 22px 0 0; font-family: var(--serif); font-size: clamp(22px, 2.2vw, 32px); line-height: 1.2; color: var(--kh-txt); }
+.kh-chap[data-stage="0"] .kh-ch[data-i="0"], .kh-chap[data-stage="1"] .kh-ch[data-i="1"], .kh-chap[data-stage="2"] .kh-ch[data-i="2"] { opacity: 1; translate: 0 0; }
+.kh-chap__bar { position: absolute; left: 0; bottom: 0; width: 120px; height: 1px; background: var(--kh-line); }
+.kh-chap__bar i { display: block; height: 100%; width: 100%; background: var(--kh-gold); transform-origin: 0 50%; transform: scaleX(var(--pp)); }
+.kh-chap__vis { position: relative; height: min(72vh, 640px); border-radius: 4px; overflow: hidden; background: var(--kh-bg2); }
+.kh-chap__vis img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; scale: 1.14; transition: opacity 1s var(--ease), scale 2.2s var(--ease); }
+.kh-chap[data-stage="0"] .kh-chap__vis img[data-i="0"], .kh-chap[data-stage="1"] .kh-chap__vis img[data-i="1"], .kh-chap[data-stage="2"] .kh-chap__vis img[data-i="2"] { opacity: 1; scale: 1; }
+.kh-chap__vis::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px var(--kh-line); border-radius: inherit; pointer-events: none; }
+
+/* ───────── 5. Notes : trois colonnes ───────── */
+.kh-notes { padding: clamp(72px, 10vw, 150px) var(--pad); background: var(--kh-bg2); color: var(--kh-txt); }
+.kh-notes > h2 { font-size: clamp(34px, 4.6vw, 72px); margin-bottom: clamp(36px, 6vw, 84px); }
+.kh-notes__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--kh-line); }
+.kh-note { padding: 28px clamp(16px, 2.4vw, 36px) 12px 0; }
+.kh-note + .kh-note { padding-left: clamp(16px, 2.4vw, 36px); border-left: 1px solid var(--kh-line); }
+.kh-note__no { display: block; font-family: var(--serif); font-style: italic; font-size: clamp(64px, 8vw, 128px); line-height: .9; color: var(--kh-gold); }
+.kh-note h3 { margin-top: 18px; font-size: clamp(24px, 2.4vw, 36px); }
+.kh-note p { margin: 8px 0 0; font-size: 13px; line-height: 20px; color: var(--kh-dim); }
+.kh-note ul { margin: 22px 0 0; padding: 0; list-style: none; font-family: var(--serif); font-size: clamp(22px, 2vw, 30px); line-height: 1.5; }
+
+/* ───────── 6. Chiffres de la fiche ───────── */
+.kh-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); background: var(--kh-bg); color: var(--kh-txt); border-block: 1px solid var(--kh-line); }
+.kh-fact { padding: clamp(32px, 5vw, 64px) var(--pad) clamp(32px, 5vw, 64px) clamp(20px, 3vw, 44px); border-right: 1px solid var(--kh-line); }
+.kh-fact:last-child { border-right: 0; }
+.kh-fact dt { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--kh-dim); }
+.kh-fact dd { margin: 14px 0 0; font-family: var(--serif); font-size: clamp(28px, 3.2vw, 50px); line-height: 1; color: var(--kh-gold); }
+
+/* ───────── 7. Galerie en trois plans ───────── */
+.kh-gal { display: grid; grid-template-columns: 1.1fr .8fr 1fr; gap: clamp(10px, 1.6vw, 24px); align-items: end; padding: clamp(64px, 9vw, 140px) var(--pad); background: var(--kh-bg); }
+.kh-gal figure { position: relative; margin: 0; }
+.kh-gal .op-crop { aspect-ratio: 3 / 4; border-radius: 4px; }
+.kh-gal figure:nth-child(2) { align-self: start; margin-top: clamp(40px, 8vw, 120px); }
+.kh-gal figure:nth-child(2) .op-crop { aspect-ratio: 4 / 5; border-radius: 999px 999px 4px 4px; }
+.kh-gal figcaption { margin-top: 12px; font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--kh-dim); }
+.op-reveal.op-clip figcaption { display: block; }
+
+/* ───────── 8. Final ───────── */
+.kh-final { position: relative; isolation: isolate; min-height: 92svh; display: grid; place-items: center; overflow: hidden; text-align: center; background: var(--kh-bg); color: var(--kh-txt); padding: clamp(80px, 12vw, 160px) var(--pad); }
+.kh-final__bg { position: absolute; inset: 0; z-index: -1; opacity: .5; }
+.kh-final__bg img { width: 100%; height: 100%; object-fit: cover; scale: calc(1.1 + var(--pp, 0) * 0); }
+.kh-final__bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(23, 11, 6, .35), var(--kh-bg) 78%); }
+.kh-final h2 { font-size: clamp(60px, 14vw, 240px); line-height: .84; font-style: italic; }
+.kh-final p { max-width: 30ch; margin: 26px auto 28px; font-family: var(--serif); font-size: clamp(22px, 2.4vw, 34px); line-height: 1.15; color: var(--kh-gold); }
+
+/* ───────── Mobile ───────── */
+@media (max-width: 900px) {
+  .kh-ring { width: calc(38vw * 2 + 40px); top: 46%; }
+  .kh-hero__disc { clip-path: circle(calc(var(--o) * 38vw + var(--e) * 100vmax) at 50% 46%); }
+  .kh-hero__title { font-size: clamp(64px, 24vw, 130px); }
+  .kh-hero__l1 { top: 3%; left: 5vw; }
+  .kh-hero__l2 { bottom: 12%; right: 5vw; }
+  .kh-hero__sub { font-size: 10px; letter-spacing: .24em; bottom: 4%; }
+  .kh-man h2 { font-size: clamp(30px, 9vw, 52px); }
+  .kh-chap { height: 300vh; }
+  .kh-chap__pin { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 46%) minmax(0, 1fr); gap: 18px; padding-top: 18px; align-content: start; }
+  .kh-chap__vis { order: -1; height: 100%; }
+  .kh-chap__txt { height: 100%; }
+  .kh-ch { justify-content: flex-start; padding-top: 28px; }
+  .kh-ch h3 { font-size: clamp(56px, 17vw, 90px); }
+  .kh-ch p { margin-top: 12px; font-size: 20px; }
+  .kh-notes__grid { grid-template-columns: minmax(0, 1fr); }
+  .kh-note + .kh-note { padding-left: 0; border-left: 0; border-top: 1px solid var(--kh-line); margin-top: 20px; }
+  .kh-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kh-fact:nth-child(2n) { border-right: 0; }
+  .kh-fact { border-bottom: 1px solid var(--kh-line); padding: 26px 18px; }
+  .kh-gal { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .kh-gal figure:first-child { grid-column: 1 / -1; }
+  .kh-gal figure:nth-child(2) { margin-top: 0; }
+  .kh-gal figure:first-child .op-crop { aspect-ratio: 4 / 3; }
+  .kh-final h2 { font-size: clamp(60px, 22vw, 120px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kh-marq__in, .kh-ring svg { animation: none; }
+  .kh-hero__disc { animation: none; --o: 1; }
+}

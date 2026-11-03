@@ -25,6 +25,8 @@ export type Product = {
   category?: string; // Parfums, Maquillage, Soins… (productType Shopify) : sert au filtre des collections
   engraving?: boolean; // gravure proposée (étiquette « gravure » dans Shopify)
   notes?: { top?: string; heart?: string; base?: string }; // pyramide olfactive, depuis les étiquettes tete:/coeur:/fond:
+  ingredients?: string; // liste INCI, depuis le champ personnalisé Shopify custom.ingredients (fiche produit)
+  allergens?: string; // depuis custom.allergens
   description?: string; // texte complet (fiche produit)
   images?: { url: string; alt: string; width: number; height: number }[]; // galerie (fiche produit)
   media?: MediaItem[]; // galerie complète : images + vidéos, dans l'ordre Shopify (fiche produit)
@@ -107,6 +109,8 @@ type Node = {
   gallery?: { nodes: { url: string; altText: string | null; width: number; height: number }[] };
   firstMedia?: { nodes: MediaNode[] };
   media?: { nodes: MediaNode[] };
+  ingredientsField?: { value: string } | null;
+  allergensField?: { value: string } | null;
 };
 
 type Img = { url: string; altText: string | null; width: number; height: number };
@@ -168,6 +172,8 @@ const mapNode = (p: Node): Product => ({
   badges: p.tags.filter((t) => ["Nouveauté", "Exclusivité", "Service d'essai"].includes(t)),
   intensity: Number(p.tags.find((t) => /^intensite-[1-5]$/.test(t))?.slice(-1)) || undefined,
   notes: (() => { const t = (k: string) => p.tags.find((x) => x.toLowerCase().startsWith(k + ":"))?.slice(k.length + 1).trim() || undefined; const n = { top: t("tete"), heart: t("coeur"), base: t("fond") }; return n.top || n.heart || n.base ? n : undefined; })(),
+  ingredients: p.ingredientsField?.value?.trim() || undefined,
+  allergens: p.allergensField?.value?.trim() || undefined,
   description: p.description || undefined,
   images: (p.images ?? p.gallery)?.nodes.map((i) => ({ url: i.url, alt: i.altText ?? p.title, width: i.width, height: i.height })),
   media: p.media?.nodes.map((m) => mapMedia(m, p.title)).filter((m): m is MediaItem => !!m),
@@ -187,6 +193,8 @@ const PRODUCT_QUERY = /* GraphQL */ `
   @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       ${NODE_FIELDS}
+      ingredientsField: metafield(namespace: "custom", key: "ingredients") { value }
+      allergensField: metafield(namespace: "custom", key: "allergens") { value }
       images(first: 6) { nodes { url altText width height } }
       media(first: 12) { nodes { ${MEDIA_FIELDS} } }
     }

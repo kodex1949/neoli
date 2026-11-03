@@ -1,0 +1,9 @@
+/* Khamrah Mira : même mise en page que Opulent Milano, palette ambre, caramel et rose poudré. */
+.op.op--amber {
+  --stone: #f0e7db; --stone-2: #e5d8c6;
+  --ink: #3b1709; --deep: #2a1008; --em: #5b2711;
+  --gold: #c58a3c; --gold-l: #efcc92; --rose: #e4a78e;
+  --shade: 42, 16, 8;
+  --text: #2b1a11; --muted: #6d5a4e;
+}
+.op--amber .op-link, .op--amber .op-link--dark { text-decoration-color: rgba(43, 26, 17, .4); }

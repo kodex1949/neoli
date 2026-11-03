@@ -12,6 +12,8 @@ import { CartProvider } from "@/lib/cart";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { FavoritesProvider } from "@/lib/favorites";
 import { getMenuMedia } from "@/lib/menu-media";
+import { Analytics } from "@vercel/analytics/next";
+import { Tracker } from "@/components/Tracker";
 
 export const metadata: Metadata = {
   title: "ESSNC — Beauté, parfums & soins",
@@ -32,12 +34,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </ChromeGate>
           <CartToast />
           <ReferralCapture />
+          <Tracker />
           <main>{children}</main>
           <ChromeGate hideOn={["/panier", "/admin"]}>
             <Footer />
           </ChromeGate>
         </CartProvider>
         </FavoritesProvider>
+        <Analytics />
       </body>
     </html>
   );

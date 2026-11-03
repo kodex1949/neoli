@@ -15,6 +15,8 @@ const ITEMS: { group: string; items: Item[] }[] = [
     group: "Pilotage",
     items: [
       { href: "/admin", label: "Tableau de bord", hint: "Vue d'ensemble", icon: I(<><rect x="4" y="4" width="7" height="7" /><rect x="13" y="4" width="7" height="7" /><rect x="4" y="13" width="7" height="7" /><rect x="13" y="13" width="7" height="7" /></>) },
+      { href: "/admin/commandes", label: "Commandes", hint: "Paiement, expédition, retours", icon: I(<><path d="M5 8h14l-1.2 11H6.2L5 8Z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></>) },
+      { href: "/admin/analytics", label: "Analytics", hint: "Ventes, audience, fiabilité", icon: I(<><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></>) },
     ],
   },
   {

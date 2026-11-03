@@ -6,7 +6,7 @@ import { useSheetDrag } from "@/lib/sheet";
 
 const idx = (i: number) => ({ "--i": i }) as CSSProperties;
 
-export type PanelItem = { title: string; text: string; points?: string[] };
+export type PanelItem = { title: string; text: string; points?: string[]; groups?: { label: string; value: string }[] };
 
 /** Rangées façon dior.com : titre + chevron ; un clic ouvre un panneau en verre dépoli qui glisse depuis la droite. */
 export function Accordion({ items }: { items: PanelItem[] }) {
@@ -65,10 +65,20 @@ export function Accordion({ items }: { items: PanelItem[] }) {
             <div className="sheet__body" id="sheet-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
               <section key={tab} className="sheet__sec">
                 <h2 className="sheet__title sheet__anim" style={idx(1)}>{items[tab].title}</h2>
-                <p className="sheet__text sheet__anim" style={idx(2)}>{items[tab].text}</p>
+                {items[tab].text && <p className="sheet__text sheet__anim" style={idx(2)}>{items[tab].text}</p>}
+                {items[tab].groups && (
+                  <dl className="sheet__groups">
+                    {items[tab].groups!.map((g, n) => (
+                      <div key={g.label} className="sheet__group sheet__anim" style={idx(3 + n)}>
+                        <dt>{g.label}</dt>
+                        <dd>{g.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
                 {items[tab].points && (
                   <ul className="sheet__points">
-                    {items[tab].points!.map((y, n) => <li key={y} className="sheet__anim" style={idx(3 + n)}>{y}</li>)}
+                    {items[tab].points!.map((y, n) => <li key={y} className="sheet__anim" style={idx(6 + n)}>{y}</li>)}
                   </ul>
                 )}
               </section>

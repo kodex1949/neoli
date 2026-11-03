@@ -5,24 +5,38 @@ import type { Media } from "./collections";
 
 export const ACCORDIONS: { title: string; text: string; points?: string[] }[] = [
   {
-    title: "Ingrédients",
-    text: "Alcool, parfum, eau, extraits naturels de fleurs et de bois. La liste complète figure sur l'emballage et sur l'étiquette du flacon.",
-    points: ["Formule vegan, sans paraben", "Flacon rechargeable en boutique", "Allergènes : linalol, limonène, géraniol"],
-  },
-  {
     title: "Livraison & retours",
     text: "Livraison offerte dès 100 € d'achat, expédition sous 48 h. Retour gratuit sous 30 jours pour tout produit non ouvert.",
     points: ["Standard : 3 à 5 jours ouvrés", "Express : 24 à 48 h", "Retrait en boutique gratuit", "Emballage cadeau offert"],
   },
 ];
 
+/** Onglet « Ingrédients » : affiché seulement si la liste est renseignée dans Shopify (champ personnalisé custom.ingredients, et custom.allergens en option). */
+export function ingredientsAccordion(ingredients?: string, allergens?: string): { title: string; text: string; points?: string[]; groups?: { label: string; value: string }[] } | null {
+  if (!ingredients) return null;
+  const points = allergens ? [`Allergènes : ${allergens}`] : undefined;
+  // Structure « NOTES DE TÊTE … NOTES DE CŒUR … NOTES DE FOND … » (une ligne ou plusieurs) : on la découpe en trois blocs lisibles.
+  const re = /notes?\s+de\s+(t[êe]te|c[œo]e?ur|fond)\s*:?/gi;
+  const found = [...ingredients.matchAll(re)];
+  if (found.length) {
+    const label = (k: string) => (/^t/i.test(k) ? "Notes de tête" : /^f/i.test(k) ? "Notes de fond" : "Notes de cœur");
+    const clean = (v: string) => v.replace(/\s+/g, " ").replace(/[\s,;.]+$/, "").trim();
+    const groups = found
+      .map((m, i) => ({ label: label(m[1]), value: clean(ingredients.slice(m.index! + m[0].length, found[i + 1]?.index ?? undefined)) }))
+      .filter((g) => g.value);
+    const intro = clean(ingredients.slice(0, found[0].index));
+    return { title: "Ingrédients", text: intro, points, groups };
+  }
+  return { title: "Ingrédients", text: ingredients, points };
+}
+
 export type ScentNotes = { top?: string; heart?: string; base?: string };
 
 /** Onglet « Notes olfactives » : affiché seulement si les notes sont renseignées dans Shopify (étiquettes tete:, coeur:, fond:). */
-export function scentAccordion(n?: ScentNotes): { title: string; text: string; points: string[] } | null {
+export function scentAccordion(n?: ScentNotes): { title: string; text: string; groups: { label: string; value: string }[] } | null {
   if (!n || (!n.top && !n.heart && !n.base)) return null;
-  const points = [n.top && `Tête : ${n.top}`, n.heart && `Cœur : ${n.heart}`, n.base && `Fond : ${n.base}`].filter((x): x is string => !!x);
-  return { title: "Notes olfactives", text: "Les notes se dévoilent dans le temps, de la première vaporisation jusqu'au sillage.", points };
+  const groups = [n.top && { label: "Notes de tête", value: n.top }, n.heart && { label: "Notes de cœur", value: n.heart }, n.base && { label: "Notes de fond", value: n.base }].filter((x): x is { label: string; value: string } => !!x);
+  return { title: "Notes olfactives", text: "Les notes se dévoilent dans le temps, de la première vaporisation jusqu'au sillage.", groups };
 }
 
 export const PERKS = ["Service d'essai : un échantillon offert", "Emballage cadeau offert", "Livraison offerte dès 100 €"];
