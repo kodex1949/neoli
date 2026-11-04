@@ -42,7 +42,7 @@ const bySlug = new Map(DIRECTORY.map((d) => [brandSlug(d.name), d]));
 export const directoryFor = (slug: string) => bySlug.get(slug);
 
 export type ShownBrand = Brand & { origin?: string; text?: string };
-export type GroupView = { id: BrandGroupId; title: string; intro: string; available: ShownBrand[]; soon: DirEntry[] };
+export type GroupView = { id: BrandGroupId; title: string; short: string; intro: string; available: ShownBrand[]; soon: DirEntry[] };
 
 /** Regroupe les marques Shopify (avec produits) et les maisons de l'annuaire (sans produit pour l'instant). */
 export function groupBrands(shopify: Brand[]): GroupView[] {
