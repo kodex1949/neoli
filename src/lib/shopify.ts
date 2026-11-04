@@ -57,6 +57,15 @@ async function storefront<T>(query: string, variables: Record<string, unknown> =
   return json.data as T;
 }
 
+// Pendant la construction du site uniquement : si Shopify refuse la requête (clé absente ou erronée sur l'hébergeur), on ne bloque pas toute la mise en ligne.
+// En fonctionnement normal l'erreur reste visible. Les pages se régénèrent d'elles-mêmes (revalidate) dès que Shopify répond.
+async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
+  try { return await fn(); } catch (e) {
+    if (process.env.NEXT_PHASE === "phase-production-build") { console.warn("Shopify indisponible pendant la construction :", e instanceof Error ? e.message : e); return fallback; }
+    throw e;
+  }
+}
+
 const MEDIA_FIELDS = /* GraphQL */ `
   mediaContentType
   alt
@@ -189,8 +198,10 @@ const mapNode = (p: Node): Product => ({
 
 export async function getProducts(first = 8): Promise<Product[]> {
   if (!domain || !token) return DEMO.slice(0, first);
-  const data = await storefront<{ products: { nodes: Node[] } }>(PRODUCTS_QUERY, { first, country: "FR", language: "FR" });
-  return data.products.nodes.map(mapNode);
+  return safe(async () => {
+    const data = await storefront<{ products: { nodes: Node[] } }>(PRODUCTS_QUERY, { first, country: "FR", language: "FR" });
+    return data.products.nodes.map(mapNode);
+  }, []);
 }
 
 const PRODUCT_QUERY = /* GraphQL */ `
@@ -208,8 +219,10 @@ const PRODUCT_QUERY = /* GraphQL */ `
 
 export async function getProduct(handle: string): Promise<Product | null> {
   if (!domain || !token) return DEMO.find((p) => p.handle === handle) ?? null;
-  const data = await storefront<{ product: Node | null }>(PRODUCT_QUERY, { handle, country: "FR", language: "FR" });
-  return data.product ? mapNode(data.product) : null;
+  return safe(async () => {
+    const data = await storefront<{ product: Node | null }>(PRODUCT_QUERY, { handle, country: "FR", language: "FR" });
+    return data.product ? mapNode(data.product) : null;
+  }, null);
 }
 
 // ---------- Marques ----------
@@ -257,8 +270,10 @@ export async function getBrands(): Promise<Brand[]> {
 export async function getBrandProducts(name: string): Promise<Product[]> {
   if (!domain || !token) return [];
   const q = `vendor:'${name.replace(/'/g, "\\'")}'`;
-  const data = await storefront<{ products: { nodes: Node[] } }>(BRAND_PRODUCTS_QUERY, { q, first: 48, country: "FR", language: "FR" });
-  return data.products.nodes.map(mapNode).filter((p) => !p.brand || brandSlug(p.brand) === brandSlug(name));
+  return safe(async () => {
+    const data = await storefront<{ products: { nodes: Node[] } }>(BRAND_PRODUCTS_QUERY, { q, first: 48, country: "FR", language: "FR" });
+    return data.products.nodes.map(mapNode).filter((p) => !p.brand || brandSlug(p.brand) === brandSlug(name));
+  }, []);
 }
 
 export type Collection = { title: string; description?: string; products: Product[] };
@@ -281,12 +296,14 @@ export async function getCollection(handle: string, fallbackTitle?: string): Pro
     const list = filter ? DEMO.filter(filter) : DEMO;
     return { title: fallbackTitle ?? handle, products: list.length ? list : DEMO };
   }
-  const data = await storefront<{ collection: { title: string; description: string; products: { nodes: Node[] } } | null }>(
-    COLLECTION_QUERY,
-    { handle, first: 48, country: "FR", language: "FR" },
-  );
-  if (!data.collection) return null;
-  return { title: data.collection.title, description: data.collection.description || undefined, products: data.collection.products.nodes.map(mapNode) };
+  return safe(async () => {
+    const data = await storefront<{ collection: { title: string; description: string; products: { nodes: Node[] } } | null }>(
+      COLLECTION_QUERY,
+      { handle, first: 48, country: "FR", language: "FR" },
+    );
+    if (!data.collection) return null;
+    return { title: data.collection.title, description: data.collection.description || undefined, products: data.collection.products.nodes.map(mapNode) } as Collection;
+  }, null);
 }
 
 // Crée un panier Shopify et renvoie l'adresse de paiement (null si Shopify n'est pas configuré)
