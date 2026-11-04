@@ -1,6 +1,6 @@
 // Mesure d'audience maison, sans cookie : un identifiant aléatoire par onglet (sessionStorage), jamais d'adresse IP ni de donnée personnelle.
 // Respecte « Ne pas me suivre » (DNT) et Global Privacy Control.
-export type TrackType = "pageview" | "add_to_cart" | "begin_checkout";
+export type TrackType = "pageview" | "add_to_cart" | "begin_checkout" | "login" | "signup";
 
 const KEY = "essnc-sid";
 const sid = () => {

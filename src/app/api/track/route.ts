@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const TYPES = new Set(["pageview", "add_to_cart", "begin_checkout"]);
+const TYPES = new Set(["pageview", "add_to_cart", "begin_checkout", "login", "signup"]);
 const BOT = /bot|crawl|spider|slurp|preview|lighthouse|headless|monitor|facebookexternalhit|vercel-screenshot|curl|wget/i;
 const str = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, max) : "");
 const done = () => new NextResponse(null, { status: 204 });
@@ -30,9 +30,12 @@ export async function POST(req: NextRequest) {
     const handle = /^\/produits\/([a-z0-9-]{1,100})$/i.exec(path)?.[1] ?? (/^[a-z0-9-]{1,100}$/i.test(str(b.h, 100)) ? str(b.h, 100) : null);
     const v = typeof b.v === "number" && Number.isFinite(b.v) && b.v >= 0 && b.v < 100000 ? Math.round(b.v * 100) / 100 : null;
 
+    const cc = (req.headers.get("x-vercel-ip-country") ?? "").toUpperCase();
+    const country = /^[A-Z]{2}$/.test(cc) && cc !== "XX" && cc !== "T1" ? cc : null;
+
     const db = createClient(url, service, { auth: { persistSession: false } });
     await db.from("analytics_events").insert({
-      sid, type, path, ref: str(b.ref, 100) || null, src: str(b.src, 60).toLowerCase() || null, med: str(b.med, 60).toLowerCase() || null, v, handle,
+      sid, type, path, ref: str(b.ref, 100) || null, src: str(b.src, 60).toLowerCase() || null, med: str(b.med, 60).toLowerCase() || null, v, handle, country,
     });
   } catch { /* ignoré */ }
   return done();

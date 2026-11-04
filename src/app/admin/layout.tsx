@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { AdminShell } from "@/components/AdminShell";
 
@@ -14,8 +15,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     db.from("reviews").select("id", { count: "exact", head: true }).eq("status", "pending"),
     db.from("agent_recommendations").select("id", { count: "exact", head: true }).eq("status", "open"),
   ]);
+  const collapsed = (await cookies()).get("adm_side")?.value === "1";
   return (
-    <AdminShell email={u.user.email ?? ""} badges={{ "/admin/avis": reviews.count ?? 0, "/admin/agents": recs.count ?? 0 }}>
+    <AdminShell initialCollapsed={collapsed} email={u.user.email ?? ""} badges={{ "/admin/avis": reviews.count ?? 0, "/admin/agents": recs.count ?? 0, "/admin/approbations": recs.count ?? 0 }}>
       {children}
     </AdminShell>
   );

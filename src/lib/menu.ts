@@ -4,9 +4,10 @@ export type MenuLink = { label: string; href: string };
 
 export type Submenu = {
   title: string;
-  iconics?: { label: string; href: string; image?: string }[]; // petites vignettes « Les iconiques »
+  iconics?: { label: string; href: string; image?: string; contain?: boolean }[]; // contain = flacon entier, sans fond ni découpe // petites vignettes « Les iconiques »
+  iconicsLabel?: string; // titre de la rangée de vignettes (par défaut « Nouveautés & coups de cœur »)
   groups: MenuLink[][]; // listes séparées par un trait
-  cards: { eyebrow: string; title: string; href: string; image?: string }[]; // 2 grandes cartes à droite
+  cards: { eyebrow: string; title: string; href: string; image?: string }[]; // 1 à 2 grandes cartes à droite
 };
 
 export type MenuItem = { id: string; label: string; href: string; submenu?: Submenu };

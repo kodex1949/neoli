@@ -9,7 +9,7 @@ import "./commandes.css";
 export const metadata: Metadata = { title: "Commandes — ESSNC", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-const STORE_ADMIN = "https://admin.shopify.com/store/9nwbbg-xh";
+const STORE_ADMIN = "https://admin.shopify.com/store/3rhvh0-9q";
 const PAGE = 25;
 const LATE_HOURS = 48;
 

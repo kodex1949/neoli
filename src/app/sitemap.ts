@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getProducts, getCollection } from "@/lib/shopify";
+import { getProducts, getCollection, getBrands } from "@/lib/shopify";
+import { brandHref } from "@/lib/brands";
 import { MENU } from "@/lib/menu";
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL || "https://neoli-nu.vercel.app").replace(/\/$/, "");
@@ -21,10 +22,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     )
   ).filter((h): h is string => !!h);
+  let brands: Awaited<ReturnType<typeof getBrands>> = [];
+  try { brands = await getBrands(); } catch { /* marques indisponibles */ }
   const now = new Date();
   return [
     { url: BASE, lastModified: now, priority: 1 },
     ...existing.map((h) => ({ url: BASE + h, lastModified: now, priority: 0.7 })),
+    ...(brands.length ? [{ url: `${BASE}/marques`, lastModified: now, priority: 0.8 }] : []),
+    ...brands.map((b) => ({ url: BASE + brandHref(b), lastModified: now, priority: 0.7 })),
     ...products.map((p) => ({ url: `${BASE}/produits/${p.handle}`, lastModified: now, priority: 0.8 })),
   ];
 }

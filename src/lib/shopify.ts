@@ -1,3 +1,5 @@
+import { brandSlug, type Brand } from "./brands";
+
 // Client Storefront API (GraphQL). Sans variables d'environnement, on renvoie des produits de démonstration.
 
 /** Élément de la galerie : image, vidéo hébergée par Shopify (sources mp4) ou vidéo externe (YouTube / Vimeo). `url` = image fixe (ou affiche de la vidéo). */
@@ -22,6 +24,7 @@ export type Product = {
   badges?: string[]; // ex. « Nouveauté », « Exclusivité », « Service d'essai »
   intensity?: number; // 1 à 5, parfums uniquement
   format?: string; // ex. « Spray 50 ml »
+  brand?: string; // marque (champ « Fournisseur » de Shopify)
   category?: string; // Parfums, Maquillage, Soins… (productType Shopify) : sert au filtre des collections
   engraving?: boolean; // gravure proposée (étiquette « gravure » dans Shopify)
   notes?: { top?: string; heart?: string; base?: string }; // pyramide olfactive, depuis les étiquettes tete:/coeur:/fond:
@@ -70,6 +73,7 @@ const NODE_FIELDS = /* GraphQL */ `
   description
   tags
   productType
+  vendor
   featuredImage { url altText width height }
   gallery: images(first: 3) { nodes { url altText width height } }
   firstMedia: media(first: 1) { nodes { ${MEDIA_FIELDS} } }
@@ -101,7 +105,7 @@ const money = (amount: string, currency: string) =>
   new Intl.NumberFormat("fr-FR", { style: "currency", currency }).format(Number(amount));
 
 type Node = {
-  id: string; handle: string; title: string; description: string; tags: string[]; productType: string;
+  id: string; handle: string; title: string; description: string; tags: string[]; productType: string; vendor?: string;
   featuredImage: { url: string; altText: string | null; width: number; height: number } | null;
   priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
   variants: { nodes: { id: string; title: string; price: { amount: string; currencyCode: string }; weight?: number | null; weightUnit?: string | null }[] };
@@ -166,6 +170,7 @@ const mapNode = (p: Node): Product => ({
     : undefined,
   variantId: p.variants.nodes[0]?.id,
   category: p.productType || undefined,
+  brand: p.vendor?.trim() || undefined,
   engraving: p.tags.includes("gravure") || undefined,
   // Dans Shopify : description = texte court ; étiquettes « Nouveauté », « Exclusivité », « Service d'essai », « intensite-3 », « format:Spray 50 ml »
   tagline: p.description ? shortLine(p.description.split("\n")[0]) : undefined,
@@ -205,6 +210,55 @@ export async function getProduct(handle: string): Promise<Product | null> {
   if (!domain || !token) return DEMO.find((p) => p.handle === handle) ?? null;
   const data = await storefront<{ product: Node | null }>(PRODUCT_QUERY, { handle, country: "FR", language: "FR" });
   return data.product ? mapNode(data.product) : null;
+}
+
+// ---------- Marques ----------
+const BRANDS_QUERY = /* GraphQL */ `
+  query Brands($country: CountryCode!, $language: LanguageCode!)
+  @inContext(country: $country, language: $language) {
+    products(first: 250, sortKey: BEST_SELLING) {
+      nodes { vendor featuredImage { url altText width height } }
+    }
+  }
+`;
+
+const BRAND_PRODUCTS_QUERY = /* GraphQL */ `
+  query BrandProducts($q: String!, $first: Int!, $country: CountryCode!, $language: LanguageCode!)
+  @inContext(country: $country, language: $language) {
+    products(first: $first, query: $q, sortKey: BEST_SELLING) {
+      nodes { ${NODE_FIELDS} }
+    }
+  }
+`;
+
+/** Marques de la boutique, regroupées depuis le champ « Fournisseur » des produits. Sans Shopify : liste vide. */
+export async function getBrands(): Promise<Brand[]> {
+  if (!domain || !token) return [];
+  const data = await storefront<{ products: { nodes: { vendor: string; featuredImage: Img | null }[] } }>(BRANDS_QUERY, { country: "FR", language: "FR" });
+  const map = new Map<string, Brand>();
+  for (const p of data.products.nodes) {
+    const name = p.vendor?.trim();
+    if (!name) continue;
+    const slug = brandSlug(name);
+    if (!slug) continue;
+    const b = map.get(slug) ?? { name, slug, count: 0 };
+    b.count += 1;
+    if (p.featuredImage) {
+      const img = { url: p.featuredImage.url, alt: p.featuredImage.altText ?? name, width: p.featuredImage.width, height: p.featuredImage.height };
+      if (!b.image) b.image = img;
+      else if (!b.image2 && img.url !== b.image.url) b.image2 = img;
+    }
+    map.set(slug, b);
+  }
+  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, "fr"));
+}
+
+/** Produits d'une marque (nom exact tel qu'écrit dans Shopify). */
+export async function getBrandProducts(name: string): Promise<Product[]> {
+  if (!domain || !token) return [];
+  const q = `vendor:'${name.replace(/'/g, "\\'")}'`;
+  const data = await storefront<{ products: { nodes: Node[] } }>(BRAND_PRODUCTS_QUERY, { q, first: 48, country: "FR", language: "FR" });
+  return data.products.nodes.map(mapNode).filter((p) => !p.brand || brandSlug(p.brand) === brandSlug(name));
 }
 
 export type Collection = { title: string; description?: string; products: Product[] };

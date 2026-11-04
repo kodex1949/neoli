@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavMenu } from "./NavMenu";
 import type { MenuMedia } from "@/lib/menu-media";
+import type { Brand } from "@/lib/brands";
 import { SearchPanel } from "./SearchPanel";
 import { UserPanel } from "./UserPanel";
 import { CartPanel } from "./CartPanel";
@@ -14,7 +15,7 @@ import { useFavorites } from "@/lib/favorites";
 
 const stroke = { strokeLinecap: "round", strokeLinejoin: "round" } as const;
 
-export function Header({ menuMedia = {} }: { menuMedia?: MenuMedia }) {
+export function Header({ menuMedia = {}, brands = [] }: { menuMedia?: MenuMedia; brands?: Brand[] }) {
   const { count: favCount } = useFavorites();
   const { count, panelOpen, openPanel, closePanel } = useCart();
   const pathname = usePathname();
@@ -205,7 +206,7 @@ export function Header({ menuMedia = {} }: { menuMedia?: MenuMedia }) {
       </header>
 
       {/* Hors du <header> : son backdrop-filter piégerait le position: fixed du menu */}
-      <NavMenu open={open} onClose={close} media={menuMedia} />
+      <NavMenu open={open} onClose={close} media={menuMedia} brands={brands} />
       <UserPanel open={userOpen} onClose={closeUser} pos={userPos} />
       <FavoritesPanel open={favOpen} onClose={closeFav} pos={favPos} />
       <CartPanel open={panelOpen} onClose={closeCart} pos={cartPos} />

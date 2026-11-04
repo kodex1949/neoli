@@ -20,7 +20,11 @@ async function adminToken(): Promise<string> {
     body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, grant_type: "client_credentials" }),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`Shopify token ${res.status}`);
+  if (!res.ok) {
+    // Corps de la réponse de Shopify (ex. invalid_client) : aide au diagnostic, ne contient aucun secret.
+    const body = (await res.text().catch(() => "")).replace(/\s+/g, " ").slice(0, 160);
+    throw new Error(`Shopify token ${res.status} · boutique « ${domain} » · ${clientId ? "identifiant " + clientId.slice(0, 4) + "…" + clientId.slice(-4) : "sans identifiant"} · ${body}`);
+  }
   const j = (await res.json()) as { access_token: string; expires_in?: number };
   cached = { token: j.access_token, exp: Date.now() + (j.expires_in ?? 86_400) * 1000 };
   return cached.token;

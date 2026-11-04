@@ -12,6 +12,7 @@ import { CartProvider } from "@/lib/cart";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { FavoritesProvider } from "@/lib/favorites";
 import { getMenuMedia } from "@/lib/menu-media";
+import { getBrands } from "@/lib/shopify";
 import { Analytics } from "@vercel/analytics/next";
 import { Tracker } from "@/components/Tracker";
 
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const menuMedia = await getMenuMedia();
+  const [menuMedia, brands] = await Promise.all([getMenuMedia(), getBrands().catch(() => [])]);
   return (
     <html lang="fr">
       <body>
@@ -30,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {/* Sur /panier : en-tête réduit (Retour + logo), sans barre d'annonce ni pied de page, comme chez Dior */}
           <ChromeGate hideOn={["/panier", "/admin"]} minimal={<ChromeMinimal />}>
             <AnnouncementBar />
-            <Header menuMedia={menuMedia} />
+            <Header menuMedia={menuMedia} brands={brands} />
           </ChromeGate>
           <CartToast />
           <ReferralCapture />

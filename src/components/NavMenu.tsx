@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { MENU, type Submenu } from "@/lib/menu";
 import { slotId, type MenuMedia, type MenuMediaItem } from "@/lib/menu-media";
+import { brandsSubmenu, type Brand } from "@/lib/brands";
+import "./nav-brands.css";
 
-type Props = { open: boolean; onClose: () => void; media?: MenuMedia };
+type Props = { open: boolean; onClose: () => void; media?: MenuMedia; brands?: Brand[] };
 
 const idx = (i: number) => ({ "--i": i }) as CSSProperties;
 
@@ -36,12 +38,20 @@ function Card({ c, i, onGo, m }: { c: CardData; i: number; onGo: () => void; m?:
   );
 }
 
-export function NavMenu({ open, onClose, media = {} }: Props) {
+export function NavMenu({ open, onClose, media = {}, brands = [] }: Props) {
+  // « Les Marques » s'insère après « Les Parfums » dès que la boutique a au moins une marque
+  const items = useMemo(() => {
+    if (!brands.length) return MENU.items;
+    const marques = { id: "marques", label: "Les Marques", href: "/marques", submenu: brandsSubmenu(brands) };
+    const at = MENU.items.findIndex((i) => i.id === "parfums");
+    return [...MENU.items.slice(0, at + 1), marques, ...MENU.items.slice(at + 1)];
+  }, [brands]);
+
   const [view, setView] = useState<string | null>(null); // id du sous-menu affiché (null = niveau 1)
   const closeRef = useRef<HTMLButtonElement>(null);
   const lastSub = useRef<Submenu | null>(null);
 
-  const sub = MENU.items.find((i) => i.id === view)?.submenu ?? null;
+  const sub = items.find((i) => i.id === view)?.submenu ?? null;
   if (sub) lastSub.current = sub;
   const asideSub = sub ?? lastSub.current; // garde le contenu pendant la fermeture de la colonne
 
@@ -114,14 +124,18 @@ export function NavMenu({ open, onClose, media = {} }: Props) {
 
                 {sub.iconics && (
                   <div className="nav__section nav__anim" style={idx(2)}>
-                    <p className="nav__label">Nouveautés & coups de cœur</p>
-                    <div className="nav__iconics">
+                    <p className="nav__label">{sub.iconicsLabel ?? "Nouveautés & coups de cœur"}</p>
+                    <div className="nav__iconics" data-bottles={sub.iconics.some((p) => p.contain) || undefined} style={{ "--n": Math.min(sub.iconics.length, 3) } as CSSProperties}>
                       {sub.iconics.map((p, k) => {
                         const m = media[slotId(view ?? "", "iconic", k)];
                         const v = visual(m, p.image);
                         return (
                         <Link key={p.label} href={m?.href || p.href} onClick={go} className="nav__iconic">
-                          <span className="nav__iconic-img" style={v.bg}>{v.video && <Clip src={v.video} />}</span>
+                          {p.contain && !m?.url && p.image ? (
+                            <span className="nav__iconic-img nav__iconic-img--bottle"><img src={p.image} alt="" loading="lazy" decoding="async" /></span>
+                          ) : (
+                            <span className="nav__iconic-img" style={v.bg}>{v.video && <Clip src={v.video} />}</span>
+                          )}
                           <span>{m?.title || p.label}</span>
                         </Link>
                         );
@@ -146,7 +160,7 @@ export function NavMenu({ open, onClose, media = {} }: Props) {
             ) : (
               <>
                 <ul className="nav__list">
-                  {MENU.items.map((it, i) => (
+                  {items.map((it, i) => (
                     <li key={it.id} className="nav__anim" style={idx(i + 1)}>
                       {it.submenu ? (
                         <button className="nav__link" onClick={() => setView(it.id)}>
@@ -160,7 +174,7 @@ export function NavMenu({ open, onClose, media = {} }: Props) {
                   ))}
                 </ul>
 
-                <div className="nav__section nav__anim" style={idx(MENU.items.length + 1)}>
+                <div className="nav__section nav__anim" style={idx(items.length + 1)}>
                   <p className="nav__label">Mon compte</p>
                   <Link href="/compte" onClick={go} className="nav__card">
                     <strong>
@@ -171,12 +185,12 @@ export function NavMenu({ open, onClose, media = {} }: Props) {
                   </Link>
                 </div>
 
-                <div className="nav__section nav__anim" style={idx(MENU.items.length + 2)}>
+                <div className="nav__section nav__anim" style={idx(items.length + 2)}>
                   <p className="nav__label">Services</p>
                   <Link href="/conseil-olfactif" onClick={go} className="nav__cta">Conseil olfactif</Link>
                 </div>
 
-                <ul className="nav__list nav__list--small nav__section nav__anim" style={idx(MENU.items.length + 3)}>
+                <ul className="nav__list nav__list--small nav__section nav__anim" style={idx(items.length + 3)}>
                   {MENU.footerLinks.map((l) => (
                     <li key={l.label}><Link href={l.href} onClick={go} className="nav__link">{l.label}</Link></li>
                   ))}
@@ -191,7 +205,7 @@ export function NavMenu({ open, onClose, media = {} }: Props) {
           {asideSub && (
             <div className="nav__aside-inner" key={asideSub.title}>
               {asideSub.cards.map((c, i) => {
-                const m = media[slotId(MENU.items.find((it) => it.submenu === asideSub)?.id ?? "", "card", i)];
+                const m = media[slotId(items.find((it) => it.submenu === asideSub)?.id ?? "", "card", i)];
                 const v = visual(m, c.image);
                 return (
                 <Link

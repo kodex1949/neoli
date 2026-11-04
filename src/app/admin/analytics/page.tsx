@@ -7,6 +7,8 @@ import { AdminHead } from "@/components/AdminHead";
 import { getProducts } from "@/lib/shopify";
 import { Donut, Heat, Histo, Meter, Spark } from "./charts";
 import { RevenueChart, type Point } from "./RevenueChart";
+import { Globe } from "./Globe";
+import { getGlobeData } from "@/lib/globe-data";
 import "./analytics.css";
 
 export const metadata: Metadata = { title: "Analytics — ESSNC", robots: { index: false, follow: false } };
@@ -208,6 +210,16 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const aRes = await db.rpc("analytics_summary", { p_days: days });
   type Agg = { first: string | null; sessions: number; pageviews: number; viewed: number; carted: number; checkout: number; abandoned: number; abandoned_value: number; daily: { d: string; s: number; p: number }[]; pages: { k: string; n: number }[]; sources: { k: string; n: number }[] };
   const A = (aRes.data ?? null) as Agg | null;
+  type Mem = { members: number; new: number; active: number; confirmed: number; daily: { d: string; n: number }[]; logins: number; signups: number; login_sessions: number; sessions: number };
+  const mRes = await db.rpc("analytics_members", { p_days: days });
+  const M = (mRes.data ?? null) as Mem | null;
+  const mDaily = new Map((M?.daily ?? []).map((x) => [x.d, x.n]));
+  const memberPoints: Point[] = [...curDays.keys()].map((k) => ({ label: labelOf(k), value: mDaily.get(k) ?? 0, orders: 0 }));
+  type Geo = { known: number; total: number; list: { c: string; s: number; l: number }[] };
+  const gRes = await db.rpc("analytics_countries", { p_days: days });
+  const G = (gRes.data ?? null) as Geo | null;
+  let globe: ReturnType<typeof getGlobeData> | null = null;
+  try { globe = getGlobeData(); } catch { globe = null; }
   const trackStart = A?.first ? Date.parse(A.first) : null;
   const windowStart = Math.max(now - days * DAY, trackStart ?? now);
   const covered = trackStart !== null && trackStart <= now - days * DAY + DAY; // mesure active sur (presque) toute la période
@@ -467,6 +479,35 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           </div>
         </>
       )}
+
+      <h2 className="an__sec">Clients et connexions</h2>
+      {!M ? (
+        <div className="an__notice" role="status"><b>Données clients indisponibles.</b> Erreur de lecture, réessayez.</div>
+      ) : (
+        <>
+          <section className="an-kpis" aria-label="Clients">
+            <div className="an-kpi"><span className="an-kpi__label">Comptes clients</span><strong>{M.members}</strong><div className="an-kpi__row"><em>{M.confirmed} e-mail{M.confirmed > 1 ? "s" : ""} confirmé{M.confirmed > 1 ? "s" : ""}</em></div></div>
+            <div className="an-kpi"><span className="an-kpi__label">Nouveaux comptes</span><strong>{M.new}</strong><div className="an-kpi__row"><em>sur {days} jours</em></div><Spark values={memberPoints.map((p) => p.value)} /></div>
+            <div className="an-kpi"><span className="an-kpi__label">Clients actifs</span><strong>{M.active}</strong><div className="an-kpi__row"><em>connectés sur {days} jours</em></div></div>
+            <div className="an-kpi"><span className="an-kpi__label">Visites connectées</span><strong>{M.login_sessions}</strong><div className="an-kpi__row"><em>{M.sessions > 0 ? `${Math.round((M.login_sessions / M.sessions) * 100)} % des sessions` : "mesure à venir"}</em></div></div>
+          </section>
+          <section className="admh__panel">
+            <div className="admh__panel-head"><h2>Connexions mesurées</h2></div>
+            <dl className="an__dl">
+              <div><dt>Connexions</dt><dd>{M.logins}</dd></div>
+              <div><dt>Inscriptions</dt><dd>{M.signups}</dd></div>
+              <div><dt>Sessions du site</dt><dd>{M.sessions}</dd></div>
+            </dl>
+            <p className="an__sub">Comptage anonyme : une connexion ou une inscription par session de navigation, sans e-mail ni identité. Les comptes viennent de la base clients ; « actifs » = dernière connexion dans la période. Les visiteurs qui refusent le suivi (DNT) ne sont pas comptés dans les connexions mesurées.</p>
+          </section>
+        </>
+      )}
+
+      <section className="admh__panel an__panel" aria-label="Origine des visiteurs">
+        <div className="admh__panel-head admh__panel-head--row"><h2>D'où viennent les visiteurs</h2><span className="an__hint">{G && G.total > 0 ? `${G.known} session${G.known > 1 ? "s" : ""} localisée${G.known > 1 ? "s" : ""} sur ${G.total}` : "Sessions par pays"}</span></div>
+        {globe ? <Globe data={globe} rows={G?.list ?? []} /> : <div className="an__notice" role="status"><b>Globe indisponible.</b> Installez les paquets : <code>npm i world-atlas world-countries</code>, puis relancez le site.</div>}
+        <p className="an__sub">Pays déduit par l'hébergeur à la visite ; ni adresse IP ni position précise n'est conservée. Une session = un onglet ouvert, comptée une fois par pays.</p>
+      </section>
 
       <h2 className="an__sec">Marges</h2>
       {costState === "off" ? null : costState === "denied" ? (

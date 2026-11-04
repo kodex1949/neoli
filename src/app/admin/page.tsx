@@ -85,7 +85,7 @@ export default async function AdminHome() {
     { label: "Avis à valider", value: pending.count ?? 0, href: "/admin/avis", note: `${approved.count ?? 0} publié${(approved.count ?? 0) > 1 ? "s" : ""}`, hot: (pending.count ?? 0) > 0 },
     { label: "Actions des agents", value: recs.data?.length ?? 0, href: "/admin/agents", note: `${alerts.count ?? 0} alerte${(alerts.count ?? 0) > 1 ? "s" : ""} non vue${(alerts.count ?? 0) > 1 ? "s" : ""}`, hot: (alerts.count ?? 0) > 0 },
     { label: "Visuels personnalisés", value: media.count ?? 0, href: "/admin/menu", note: `sur ${menuSlots().length} emplacements` },
-    { label: "Produits en ligne", value: products.length, href: "https://admin.shopify.com/store/9nwbbg-xh/products", note: "boutique Shopify", ext: true },
+    { label: "Produits en ligne", value: products.length, href: "https://admin.shopify.com/store/3rhvh0-9q/products", note: "boutique Shopify", ext: true },
   ];
 
   const extra = [
@@ -100,7 +100,7 @@ export default async function AdminHome() {
   const today = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
 
   return (
-    <div className="admh">
+    <div className="admh admh--wide">
       <header className="admh__head">
         <p className="admh__eyebrow">{today}</p>
         <h1 className="admh__title">{hello}.</h1>
@@ -163,8 +163,8 @@ export default async function AdminHome() {
             <Link href="/admin/menu" className="admh__tile"><b>Menu</b><span>Vignettes, cartes, vidéos</span></Link>
             <Link href="/admin/avis" className="admh__tile"><b>Avis clients</b><span>Publier, refuser, supprimer</span></Link>
             <Link href="/admin/agents" className="admh__tile"><b>Audit de la boutique</b><span>Lancer et valider les actions</span></Link>
-            <a href="https://admin.shopify.com/store/9nwbbg-xh/products" target="_blank" rel="noreferrer" className="admh__tile"><b>Produits</b><span>Prix, formats, étiquettes (Shopify)</span></a>
-            <a href="https://admin.shopify.com/store/9nwbbg-xh/orders" target="_blank" rel="noreferrer" className="admh__tile"><b>Commandes</b><span>Suivi et expéditions (Shopify)</span></a>
+            <a href="https://admin.shopify.com/store/3rhvh0-9q/products" target="_blank" rel="noreferrer" className="admh__tile"><b>Produits</b><span>Prix, formats, étiquettes (Shopify)</span></a>
+            <a href="https://admin.shopify.com/store/3rhvh0-9q/orders" target="_blank" rel="noreferrer" className="admh__tile"><b>Commandes</b><span>Suivi et expéditions (Shopify)</span></a>
           </div>
         </section>
       </div>
@@ -204,7 +204,7 @@ export default async function AdminHome() {
 
       <div className="admh__cols admh__cols--even">
         <section className="admh__panel">
-          <div className="admh__panel-head admh__panel-head--row"><h2>Catalogue</h2><a href="https://admin.shopify.com/store/9nwbbg-xh/products" target="_blank" rel="noreferrer">Ouvrir Shopify</a></div>
+          <div className="admh__panel-head admh__panel-head--row"><h2>Catalogue</h2><a href="https://admin.shopify.com/store/3rhvh0-9q/products" target="_blank" rel="noreferrer">Ouvrir Shopify</a></div>
           {cats.length === 0 && <p className="admh__empty">Aucun produit lu pour le moment.</p>}
           <ul className="admh__bars">
             {cats.map(([name, n]) => (

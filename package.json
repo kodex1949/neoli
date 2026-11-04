@@ -16,7 +16,9 @@
     "@vercel/analytics": "^1.6.1",
     "next": "15.5.14",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "world-atlas": "^2.0.2",
+    "world-countries": "^5.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
