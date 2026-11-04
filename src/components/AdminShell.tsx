@@ -19,6 +19,7 @@ const ITEMS: { group: string; items: Item[] }[] = [
       { href: "/admin/commandes", label: "Commandes", hint: "Paiement, expédition, retours", icon: I(<><path d="M5 8h14l-1.2 11H6.2L5 8Z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></>) },
       { href: "/admin/stocks", label: "Stocks", hint: "Ruptures, couverture, réassort", icon: I(<><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5v-7Z" /><path d="m4 8.5 8 4.5 8-4.5M12 13v7" /></>) },
       { href: "/admin/analytics", label: "Analytics", hint: "Ventes, audience, fiabilité", icon: I(<><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></>) },
+      { href: "/admin/direct", label: "En direct", hint: "Visiteurs sur le site maintenant", icon: I(<><circle cx="12" cy="12" r="2.2" /><path d="M7.6 7.6a6.2 6.2 0 0 0 0 8.8M16.4 7.6a6.2 6.2 0 0 1 0 8.8M4.8 4.8a10.2 10.2 0 0 0 0 14.4M19.2 4.8a10.2 10.2 0 0 1 0 14.4" /></>) },
     ],
   },
   {
